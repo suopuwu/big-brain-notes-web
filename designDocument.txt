@@ -1,0 +1,9 @@
+Rust server with rocket framework
+
+Build template pages with client side stuff, convert into liquid templates. Use server to save data.
+server serves pages like website.com/mario
+website.com/playername-uniqueid/set-count
+
+
+
+Possible electron app?
