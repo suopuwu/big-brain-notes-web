@@ -7,3 +7,6 @@ website.com/playername-uniqueid/set-count
 
 
 Possible electron app?
+
+
+within the note page, the theme and other universal elements are rendered by the server. Then, the client asks for their notes and those are loaded in.

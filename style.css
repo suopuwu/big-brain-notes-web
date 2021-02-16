@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Fjalla+One&family=Roboto&display=swap');
 
+
 * {
   padding: 0;
   margin: 0;
@@ -21,15 +22,13 @@ body {
 }
 
 
-
-
-
 /*sidebar and main area*/
 .nav-menu {
   background-color: #fff;
-  padding: 20px;
+  padding: 1vmax;
   display: flex;
   flex-flow: column;
+  width: 17vmax;
   z-index: 2;
 }
 
@@ -83,11 +82,9 @@ body {
   cursor: default;
 }
 
-#pss-radio:checked ~ #css {
-  display: none;
-}
-
-#css-radio:checked ~ #pss {
+#css-radio:checked ~ #pss,
+#pss-radio:checked ~ #css,
+#css-radio:checked ~ #add-char-fab {
   display: none;
 }
 
@@ -105,19 +102,12 @@ body {
   border-bottom: #cfcfcf 1px solid;
   transition: 0.3s all;
   font-size: 1.5vw;
+  width: 14vmax;
 }
 
 .search-bar > input:focus {
   outline: none;
   border-bottom: #212121 1px solid;
-}
-
-
-.toggle-button {
-  padding: 10px;
-  font-size: 1.5em;
-  background-color: cadetblue;
-  font-family: 'Fjalla One', sans-serif;
 }
 
 #search-label-icon {
@@ -210,7 +200,49 @@ body {
   padding-bottom: 100%;
 }
 
+.fab {
+  width: 4vmax;
+  height: 4vmax;
+  background-color: #212121;
+  border-radius: 50%;
+  transition: all 0.1s ease-in-out;
+  font-size: 2.5vmax;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-content: center;
+  line-height: 70px;
+  border: white solid 2px;
+  position: fixed;
+  right: 2vmax;
+  bottom: 2vmax;
+  user-select: none;
+  cursor: pointer;
+  overflow: hidden;
+}
 
+.fab:hover {
+  box-shadow: 0 6px 14px 0 #000;
+  transform: scale(1.05);
+}
+
+
+
+/*if on a phone*/
+@media screen and (orientation:portrait) {
+  body {
+    flex-flow: column;
+  }
+
+  .nav-menu {
+    width: calc(100% - 2vmax);
+  }
+
+  .tile-button {
+    width: 50%;
+  }
+}
 
 
 
@@ -237,4 +269,72 @@ body {
 .collapsed {
   width: 0;
   height: 0;
+}
+
+
+
+
+
+/*character styles*/
+.main-container {
+  flex-grow: 1;
+  min-height: calc(100% - 1.4vmax);
+  display: grid;
+  grid-template-columns: 33.333% 33.333% 33.333%;
+  font-size: 0.1vw;
+  background-color: #add;
+  padding: 0.7vmax;
+}
+
+.note-column {
+  flex-grow: 1;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
+
+.note-card {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  background-color: white;
+  width: calc(100% - 1.4vmax);
+  display: inline-flex;
+  flex-flow: column nowrap;
+  margin: 0.7vmax;
+}
+
+.note-title {
+  background-color: #212121;
+  color: white;
+  padding: 0.7vw;
+  font-size: 10em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.note-menu {
+  cursor: pointer;
+}
+
+.note-body {}
+
+.note-image {
+  width: 100%;
+  cursor: pointer;
+}
+
+.note-body > textarea {
+  margin: 0.7vmax;
+  width: calc(100% - 1.4vmax);
+  font-size: 8em;
+  height: calc(100% - 1.4vmax);
+  border: none;
+  resize: none;
+  border-bottom: solid 1px #cfcfcf;
+  transition: 0.3s all;
+
+}
+
+.note-body > textarea:focus {
+  outline: none;
+  border-bottom: solid 1px #212121;
 }

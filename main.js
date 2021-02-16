@@ -46,6 +46,13 @@ $(function () {
     });
   });
 
+  //on tile-button click, navigate
+  $('.tile-button').click(function () {
+    window.location.href = '/characters/' +
+      $(this).attr('id')
+      .slice(0, $(this).attr('id').length - 5);
+  });
+
   $('#search-label-icon').click(clearSearch);
 
   //makes all tiles visible before switching tabs to avoid confusion & deletes search text.
