@@ -13,32 +13,33 @@ function createNoteHtml() {
 }
 
 $(function () {
-    //event bindings
-    $('.text-note').on('input', function () {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight + 1) + 'px';
-        //    $(this).val('this is a big phat test'); how to change the value 
+  //event bindings
+  $('.text-note').on('input', function () {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight + 1) + 'px';
+    //    $(this).val('this is a big phat test'); how to change the value 
+  });
+
+  $('.note-image')
+    .wrap('<span style="display:inline-block"></span>')
+    .css('display', 'block')
+    .parent()
+    .zoom({
+      magnify: 1.5
     });
 
-    $('.note-image')
-        .wrap('<span style="display:inline-block"></span>')
-        .css('display', 'block')
-        .parent()
-        .zoom({
-            magnify: 1.5
-        });
+  $('#add-text-note').click(function () {
 
-    $('#add-text-note').click(function () {
+  });
 
+  //resizes textboxes to be the right size.
+  function initTextSize() {
+    $('.text-note').each(function () {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight + 1) + 'px';
     });
-    //resizes textboxes to be the right size.
-    function initTextSize() {
-        $('.text-note').each(function () {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight + 1) + 'px';
-        });
-    }
-    initTextSize();
+  }
+  initTextSize();
 });
 //todo make a test json or something to import notes from.
 //todo add a slider to change the magnification on zoom.

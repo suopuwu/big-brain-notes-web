@@ -2,61 +2,63 @@
 <html lang="">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mario | Big Brain Notes</title>
-    <link rel="icon" href="images/logo.png">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="lib/jquery.zoom.min.js"></script>
-    <script src="note.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mario | Big Brain Notes</title>
+  <link rel="icon" href="images/logo.png">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script src="lib/jquery.zoom.min.js"></script>
+  <script src="note.js"></script>
 </head>
 
 <body>
-    <div class="nav-menu shadow-2">
-        <button id="add-text-note"></button>
+  <div class="nav-menu shadow-2">
+    <button id="add-text-note"></button>
+  </div>
+  <div class="main-container" id="note-container">
+    <div class="note-column">
+
+      <span class="note-card">
+        <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+        </span>
+        <span class="note-body">
+          <textarea class="text-note" role="textbox" placeholder="Write notes here...">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quas, delectus. Magni odio vitae, dolorem neque cupiditate beatae consequuntur eligendi illo.</textarea>
+        </span>
+      </span>
+
+      <span class="note-card">
+        <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+        </span>
+        <span class="note-body">
+          <img src="images/86410508_p0_master1200.jpg" alt="" class="note-image">
+        </span>
+      </span>
     </div>
-    <div class="main-container" id="note-container">
-        <div class="note-column">
+    <div class="note-column">
 
-            <span class="note-card">
-                <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
-                </span>
-                <span class="note-body">
-                    <textarea class="text-note" role="textbox" placeholder="Write notes here...">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quas, delectus. Magni odio vitae, dolorem neque cupiditate beatae consequuntur eligendi illo.</textarea>
-                </span>
-            </span>
-
-            <span class="note-card">
-                <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
-                </span>
-                <span class="note-body">
-                    <img src="images/86410508_p0_master1200.jpg" alt="" class="note-image">
-                </span>
-            </span>
-        </div>
-        <div class="note-column">
-
-            <span class="note-card">
-                <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
-                </span>
-                <span class="note-body">
-                    <textarea class="text-note" role="textbox" placeholder="Write notes here...">lorem ipsum</textarea>
-                </span>
-            </span>
-        </div>
-        <div class="note-column">
-
-            <span class="note-card">
-                <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
-                </span>
-                <span class="note-body">
-                    <textarea class="text-note" role="textbox" placeholder="Write notes here...">Idk man</textarea>
-                </span>
-            </span>
-        </div>
+      <span class="note-card">
+        <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+        </span>
+        <span class="note-body">
+          <textarea class="text-note" role="textbox" placeholder="Write notes here...">lorem ipsum</textarea>
+        </span>
+      </span>
     </div>
+    <div class="note-column">
+
+      <span class="note-card">
+        <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+        </span>
+        <span class="note-body">
+          <textarea class="text-note" role="textbox" placeholder="Write notes here...">Idk man</textarea>
+        </span>
+      </span>
+    </div>
+  </div>
 </body>
 
 </html>

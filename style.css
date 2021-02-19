@@ -50,6 +50,7 @@ body {
   background-color: #1b1b1b;
   align-content: flex-start;
   user-select: none;
+  z-index: 1;
   min-height: 100%
 }
 
@@ -68,6 +69,7 @@ body {
   font-family: 'Fjalla one', sans-serif;
   color: #515151;
   cursor: pointer;
+  user-select: none;
 }
 
 #css-radio:checked ~ #css-tab {
@@ -222,6 +224,7 @@ body {
   user-select: none;
   cursor: pointer;
   overflow: hidden;
+  z-index: 2;
 }
 
 .fab:hover {
@@ -275,9 +278,39 @@ body {
   height: 0;
 }
 
+.transform-collapsed {
+  transform: scale(0);
+}
 
+#right-click-menu {
+  display: flex;
+  position: absolute;
+  z-index: 999;
+  flex-flow: column;
+  background-color: white;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  border-radius: 5px;
+  padding: 10px;
+  transition: transform 0.1s;
+  transform-origin: top left;
+}
 
+#right-click-menu > a {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  padding: 10px;
+  tabindex="0";
+  text-decoration: none;
+  color: #1b1b1b;
+  overflow: hidden;
+}
 
+#right-click-menu > a > i {
+  padding-right: 10px;
+}
+
+#right-click-menu > a:active {}
 
 /*character styles*/
 .main-container {

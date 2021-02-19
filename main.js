@@ -9,11 +9,17 @@ $(function () {
   };
   var mode = modes.character;
 
-  //changes the internal mode between player and character when a new tab is selected.
-  $('input:radio[name="select-screen"]').change(function () {
-    clearSearch();
+  $('input:radio[name="select-screen"]').change(internalModeSwitch);
+  $('#search-bar').on('input', pruneSearchTerms);
+  $('.tile-button').click(navigateToCharacter);
+  $('#search-label-icon').click(clearSearch);
+  $('#add-char-fab').click(addPlayer);
 
-    //switches mode variable
+  $('#pss > .tile-button').on('contextmenu', rightClickMenu);
+  //changes the internal mode between player and character when a new tab is selected.
+  //This matters because the search mode only searches in the active tab.
+  function internalModeSwitch() {
+    clearSearch();
     switch ($(this).val()) {
       case 'character':
         mode = modes.character;
@@ -22,10 +28,15 @@ $(function () {
         mode = modes.player;
         break;
     }
-  });
+  }
 
-  //narrows results from the search bar.
-  $('#search-bar').on('input', function (e) {
+  function navigateToCharacter() {
+    window.location.href = '/characters/' +
+      $(this).attr('id')
+      .slice(0, $(this).attr('id').length - 5);
+  }
+
+  function pruneSearchTerms(e) {
     const searchQuery = $('#search-bar').val();
 
     if (searchQuery.length > 0) {
@@ -44,18 +55,7 @@ $(function () {
         $(tile).addClass('collapsed');
       }
     });
-  });
-
-  //on tile-button click, navigate
-  $('.tile-button').click(function () {
-    window.location.href = '/characters/' +
-      $(this).attr('id')
-      .slice(0, $(this).attr('id').length - 5);
-  });
-
-  $('#search-label-icon').click(clearSearch);
-
-  $('#add-char-fab').click(addPlayer);
+  }
 
   //makes all tiles visible before switching tabs to avoid confusion & deletes search text.
   function clearSearch() {
@@ -66,16 +66,67 @@ $(function () {
     $('#search-label-icon').html('search');
   }
 
+  function rightClickMenu(e) {
+    //makes menu visible & positions
+    e.preventDefault();
+    $('#right-click-menu')
+      .css('top', `${e.pageY}px`)
+      .css('left', `${e.pageX}px`)
+      .removeClass('transform-collapsed');
+
+    //menu items
+    $('#menuDelete').off('click').click({
+      hostElement: this
+    }, removePlayer);
+    $('#menuRename').off('click').click({
+      hostElement: this
+    }, renamePlayer);
+
+
+
+    //closes menu when user clicks outside of it.
+    $('#right-click-menu').on('click', function (e) {
+      e.stopPropagation();
+    });
+    $(document).on('click', function (e) {
+      closeRightClickMenu();
+    });
+  }
+
+  function closeRightClickMenu() {
+    $('#right-click-menu').addClass('transform-collapsed');
+    $('#right-click-menu').off('click');
+    $(document).off('click');
+  }
+
   function addPlayer() {
-    var playerTile = `
-<span class="tile-button" id="mario-tile">
-  <span class="background-number">74e</span>
-  <span class="character-image" style="background-image: url('images/min%20min.png');"></span>
-  <span class="name-plate">mario</span>
-  <span class="foreground-number">
-    <span class="inner-foreground-number"><span>74e</span></span><span></span>
-  </span>
-</span>
-`;
+    const playerTile = `
+    <span class="tile-button" id="mario-tile" style="background-color: #${getRandomColor()};">
+      <span class="character-image" style="background-image: url('images/min%20min.png');"></span>
+      <span class="name-plate">Player</span>
+    </span>
+    `;
+
+    $('#pss').append(playerTile);
+    $('#pss > span:last-child').on('contextmenu', rightClickMenu);
+
+  }
+
+  function removePlayer(e) {
+    $(e.data.hostElement).remove();
+    closeRightClickMenu();
+  }
+
+  function renamePlayer(e) {
+    //todo you'll probably have to make a popup system for this and the delete button.
+  }
+
+  function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
   }
 });
