@@ -9,7 +9,7 @@ $(function () {
   };
   var mode = modes.character;
 
-  //changes the mode between player and character when a new tab is selected.
+  //changes the internal mode between player and character when a new tab is selected.
   $('input:radio[name="select-screen"]').change(function () {
     clearSearch();
 
@@ -55,6 +55,8 @@ $(function () {
 
   $('#search-label-icon').click(clearSearch);
 
+  $('#add-char-fab').click(addPlayer);
+
   //makes all tiles visible before switching tabs to avoid confusion & deletes search text.
   function clearSearch() {
     allTiles[mode].each(function (index, tile) {
@@ -64,4 +66,16 @@ $(function () {
     $('#search-label-icon').html('search');
   }
 
+  function addPlayer() {
+    var playerTile = `
+<span class="tile-button" id="mario-tile">
+  <span class="background-number">74e</span>
+  <span class="character-image" style="background-image: url('images/min%20min.png');"></span>
+  <span class="name-plate">mario</span>
+  <span class="foreground-number">
+    <span class="inner-foreground-number"><span>74e</span></span><span></span>
+  </span>
+</span>
+`;
+  }
 });

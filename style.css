@@ -213,7 +213,7 @@ body {
   display: flex;
   justify-content: center;
   align-content: center;
-  align-content: center;
+  align-items: center;
   line-height: 70px;
   border: white solid 2px;
   position: fixed;
