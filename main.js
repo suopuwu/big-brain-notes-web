@@ -11,7 +11,8 @@ $(function () {
 
   $('input:radio[name="select-screen"]').change(internalModeSwitch);
   $('#search-bar').on('input', pruneSearchTerms);
-  $('.tile-button').click(navigateToCharacter);
+  $('#css > .tile-button').click(navigateToCharacter);
+  $('#pss > .tile-button').click(navigateToPlayer);
   $('#search-label-icon').click(clearSearch);
   $('#add-char-fab').click(addPlayer);
 
@@ -34,6 +35,10 @@ $(function () {
     window.location.href = '/characters/' +
       $(this).attr('id')
       .slice(0, $(this).attr('id').length - 5);
+  }
+
+  function navigateToPlayer() {
+
   }
 
   function pruneSearchTerms(e) {
@@ -109,6 +114,13 @@ $(function () {
 
     $('#pss').append(playerTile);
     $('#pss > span:last-child').on('contextmenu', rightClickMenu);
+    /* TODO structure design:
+    
+    adding immediately adds dom ui elements in a loading state.
+    pings server to generate uuid and create entry in database. 
+    The server response adds in the link to the player tile.
+    removes loading style
+    */
 
   }
 
@@ -118,7 +130,35 @@ $(function () {
   }
 
   function renamePlayer(e) {
-    //todo you'll probably have to make a popup system for this and the delete button.
+    closeRightClickMenu();
+    //creates a popup with rename player content
+    suopPopUp.pop(`
+      <div>New Name</div>
+      <input type="text" id="renameCharacter" autocomplete="off" value="${$('> .name-plate', e.data.hostElement).html()}">
+      <div style="text-align: right;">
+        <a href="javascript:;" class="ripple" id="cancelRename"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
+        <a href="javascript:;" class="ripple" id="confirmRename"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
+      </div>
+    `);
+    $('#renameCharacter').select();
+
+    //awaits the text entered.
+    var text = new Promise(function (resolve, reject) {
+      $('#renameCharacter').keydown(function (e) {
+        if (e.keyCode === 13) {
+          resolve($('#renameCharacter').val());
+        }
+      });
+      $('#confirmRename').click(() => resolve($('#renameCharacter').val()));
+    });
+
+    //handles confirmation/cancellation of the rename
+    text.then(function (value) {
+        $('> .name-plate', e.data.hostElement).html(value);
+      })
+      .finally(function () {
+        suopPopUp.close();
+      });
   }
 
   function getRandomColor() {
@@ -130,3 +170,45 @@ $(function () {
     return color;
   }
 });
+
+const suopPopUp = {
+  pop: function (content) {
+    if ($('#suop-popup').length === 0) {
+      $('body').append(`
+      <div style="position:fixed;height:100vh;width:100vw;background-color:rgba(0,0,0,0.5);z-index:1000;transition: all 0.2s;display:flex;justify-content: center;align-items: center;opacity:0;backdrop-filter: blur(3px);" id="suop-popup">
+        <span id="inner-suop-popup" style ="box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);background-color:white;padding: 20px;border-radius:10px;"></span>
+      </div>
+    `);
+      replaceContent();
+      setTimeout(function () {
+        $('#suop-popup').css('opacity', '1');
+      }, 1);
+
+
+      $('#suop-popup').click(function () {
+        suopPopUp.close();
+      });
+      $('#inner-suop-popup').click(function (e) {
+        e.stopPropagation();
+
+      });
+    } else {
+      replaceContent();
+      $('#suop-popup').css('display', 'flex');
+      setTimeout(function () {
+        $('#suop-popup').css('opacity', '1');
+      }, 1);
+    }
+
+    function replaceContent() {
+      $('#inner-suop-popup').html(content);
+    }
+  },
+  close: function () {
+    $('#suop-popup').css('opacity', '0');
+    setTimeout(function () {
+      $('#suop-popup').css('display', 'none');
+    }, 200);
+  }
+
+}
