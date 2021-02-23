@@ -79,3 +79,4 @@ $(function () {
 //$('#example').trigger('zoom.destroy'); to remove zoom.
 //todo possibly add a license to avoid legal trouble.
 //todo make a list of items that are then rendered into notes
+//todo make it so that you can edith the note info like title, image, be it with a right click menu or otherwise.
