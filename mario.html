@@ -17,46 +17,63 @@
 
 <body>
   <div class="nav-menu shadow-2">
-    <button id="add-text-note"></button>
+    <h1>Add note</h1>
+    <span>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="add-text-note">
+        Text
+      </button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="add-image-note">
+        Image
+      </button>
+    </span>
   </div>
   <div class="main-container" id="note-container">
-    <div class="note-column">
+    <div class="columnWrapper">
 
-      <span class="note-card">
-        <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
-        </span>
-        <span class="note-body">
-          <textarea class="text-note" role="textbox" placeholder="Write notes here...">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quas, delectus. Magni odio vitae, dolorem neque cupiditate beatae consequuntur eligendi illo.</textarea>
-        </span>
-      </span>
+      <div class="note-column">
 
-      <span class="note-card">
-        <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+        <span class="note-card">
+          <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+          </span>
+          <span class="note-body">
+            <textarea class="text-note" role="textbox" placeholder="Write notes here...">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quas, delectus. Magni odio vitae, dolorem neque cupiditate beatae consequuntur eligendi illo.</textarea>
+          </span>
         </span>
-        <span class="note-body">
-          <img src="images/86410508_p0_master1200.jpg" alt="" class="note-image">
+
+        <span class="note-card">
+          <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+          </span>
+          <span class="note-body">
+            <img src="https://picsum.photos/400/400" alt="" class="note-image">
+          </span>
         </span>
-      </span>
+      </div>
     </div>
-    <div class="note-column">
+    <div class="columnWrapper">
 
-      <span class="note-card">
-        <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+      <div class="note-column">
+
+        <span class="note-card">
+          <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+          </span>
+          <span class="note-body">
+            <textarea class="text-note" role="textbox" placeholder="Write notes here...">lorem ipsum</textarea>
+          </span>
         </span>
-        <span class="note-body">
-          <textarea class="text-note" role="textbox" placeholder="Write notes here...">lorem ipsum</textarea>
-        </span>
-      </span>
+      </div>
     </div>
-    <div class="note-column">
+    <div class="columnWrapper">
 
-      <span class="note-card">
-        <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+      <div class="note-column">
+
+        <span class="note-card">
+          <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
+          </span>
+          <span class="note-body">
+            <textarea class="text-note" role="textbox" placeholder="Write notes here...">Idk man</textarea>
+          </span>
         </span>
-        <span class="note-body">
-          <textarea class="text-note" role="textbox" placeholder="Write notes here...">Idk man</textarea>
-        </span>
-      </span>
+      </div>
     </div>
   </div>
 </body>

@@ -16,7 +16,7 @@ html {
 
 body {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   display: grid;
   grid-template-columns: 19vmax auto;
   overflow-x: hidden;
@@ -68,6 +68,7 @@ h1 {
   padding-top: 10px;
   border-top: solid #cfcfcf 1px;
 }
+
 
 .nav-menu > h1:first-of-type {
   border-top: none;
@@ -345,6 +346,7 @@ input:focus {
   display: inline-flex;
   flex-flow: column nowrap;
   align-items: center;
+  width: 100%;
 }
 
 .note-card {
@@ -381,6 +383,11 @@ input:focus {
 
 .note-body {
   display: flex;
+  width: 100%;
+}
+
+.note-body > span {
+  width: 100%;
 }
 
 .note-image {
@@ -403,4 +410,9 @@ input:focus {
 .note-body > textarea:focus {
   outline: none;
   border-bottom: solid 1px #212121;
+}
+
+h2 {
+  font-size: 1.2em;
+
 }
