@@ -318,7 +318,6 @@ input:focus {
   flex-flow: row nowrap;
   align-items: center;
   padding: 10px;
-  tabindex="0";
   text-decoration: none;
   color: #1b1b1b;
   overflow: hidden;
@@ -328,7 +327,10 @@ input:focus {
   padding-right: 10px;
 }
 
-#right-click-menu > a:active {}
+#right-click-menu > a > i:empty {
+  padding-right: 0;
+}
+
 
 /*character styles*/
 .main-container {

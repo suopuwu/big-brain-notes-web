@@ -1,12 +1,3 @@
-const textNoteHtml = `
-<span class="note-card">
-    <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
-    </span>
-    <span class="note-body">
-        <textarea class="text-note" role="textbox" placeholder="Write notes here...">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quas, delectus. Magni odio vitae, dolorem neque cupiditate beatae consequuntur eligendi illo.</textarea>
-    </span>
-</span>
-`;
 const imageNoteHtml = `
 <span class="note-card">
     <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
@@ -17,7 +8,37 @@ const imageNoteHtml = `
 </span>
 `;
 
-function createNoteHtml() {
+function createNoteHtml(title = 'Matchup Notes', content) {
+  return `
+  <span class="note-card">
+      <span class="note-title"><span>${title}</span> <i class="material-icons note-menu">more_vert</i>
+      </span>
+      <span class="note-body">
+          <textarea class="text-note" role="textbox" placeholder="Write notes here...">${content}</textarea>
+      </span>
+  </span>
+  `;
+}
+
+function popupConfirmHtml({
+  body,
+  id,
+  title
+} = {}) {
+  this.confirmHtmlId = `cancel${id}`;
+
+  return `
+    <div>${title}</div>
+    ${body}
+    <div id="suopPopupOptions" style="text-align: right;">
+      <a href="javascript:;" class="ripple" id="cancel${id}"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
+      <a href="javascript:;" class="ripple" id="confirm${id}"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
+    </div>
+  `;
+}
+
+
+function replaceNoteImage(noteDom, newImage) {
 
 }
 
@@ -34,8 +55,8 @@ function findSmallestColumn() {
   }
   return smallestColumn;
 }
+
 $(function () {
-  //event bindings
   $('.text-note').on('input', function () {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight + 1) + 'px';
@@ -51,7 +72,7 @@ $(function () {
     });
 
   $('#add-text-note').click(() => $($('.note-column')[findSmallestColumn()])
-    .append(textNoteHtml));
+    .append(createNoteHtml()));
   $('#add-image-note').click(() => $($('.note-column')[findSmallestColumn()])
     .append(imageNoteHtml).children().last()
     .children('.note-body').children()
@@ -63,8 +84,6 @@ $(function () {
       magnify: 1.5
     }));
 
-
-
   //resizes textboxes to be the right size.
   function initTextSize() {
     $('.text-note').each(function () {
@@ -73,6 +92,42 @@ $(function () {
     });
   }
   initTextSize();
+
+  suopRightClick.initialize();
+  suopRightClick.addMenuItem({
+    title: 'Rename',
+    icon: 'edit',
+    clickEvent: function (hostElement) {
+      suopPopup.pop(popupConfirmHtml({
+        title: 'New Name',
+        id: 'renameNote',
+        body: `<input id="renameNoteInput"></input>`
+      }));
+      suopRightClick.close();
+
+      var text = new Promise(function (resolve, reject) {
+        $('#renameNoteInput').keydown(function (e) {
+          if (e.keyCode === 13) {
+            resolve($('#renameNoteInput').val());
+          }
+        });
+
+        $(document).on('click', '#confirmrenameNote', function () {
+          resolve($('#renameNoteInput').val())
+        });
+        $('#cancelrenameNote').click(() => reject());
+      });
+
+      text.then(function (newText) {
+        console.log(newText);
+      }, function () {
+        console.log('failed')
+      }).finally(function () {
+        suopPopup.close();
+      });
+    }
+  });
+  $('.note-card').on('contextmenu', suopRightClick.rightClick);
 });
 //todo make a test json or something to import notes from.
 //todo add a slider to change the magnification on zoom.
