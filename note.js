@@ -1,24 +1,37 @@
-const imageNoteHtml = `
-<span class="note-card">
-    <span class="note-title"><span>Matchup notes</span> <i class="material-icons note-menu">more_vert</i>
-    </span>
-    <span class="note-body">
-        <image src="https://picsum.photos/400/400" class="note-image">
-    </span>
-</span>
-`;
-
-function createNoteHtml(title = 'Matchup Notes', content) {
-  return `
-  <span class="note-card">
-      <span class="note-title"><span>${title}</span> <i class="material-icons note-menu">more_vert</i>
+class Note {
+  constructor({
+    content,
+    title
+  } = {
+    content: '',
+    title: 'Note Title'
+  }) {
+    this.content = content;
+    this.title = title;
+  }
+  get textHtml() {
+    return `
+    <span class="note-card">
+      <span class="note-title"><span>${this.title}</span> <i class="material-icons note-menu">more_vert</i>
       </span>
       <span class="note-body">
-          <textarea class="text-note" role="textbox" placeholder="Write notes here...">${content}</textarea>
+        <textarea class="text-note" role="textbox" placeholder="Write notes here...">${this.content}</textarea>
       </span>
-  </span>
-  `;
-}
+    </span>
+  `
+  }
+  get imageHtml() {
+    return `
+    <span class="note-card">
+      <span class="note-title"><span>Image Note</span> <i class="material-icons note-menu">more_vert</i>
+      </span>
+      <span class="note-body">
+        <image src="https://picsum.photos/400/400" class="note-image">
+      </span>
+    </span>
+  `
+  }
+};
 
 function popupConfirmHtml({
   body,
@@ -72,9 +85,10 @@ $(function () {
     });
 
   $('#add-text-note').click(() => $($('.note-column')[findSmallestColumn()])
-    .append(createNoteHtml()));
+    .append(new Note().textHtml));
+
   $('#add-image-note').click(() => $($('.note-column')[findSmallestColumn()])
-    .append(imageNoteHtml).children().last()
+    .append(new Note().imageHtml).children().last()
     .children('.note-body').children()
     //finds the image within the newly created note
     .wrap('<span style="display:inline-block"></span>')
@@ -135,3 +149,6 @@ $(function () {
 //todo possibly add a license to avoid legal trouble.
 //todo make a list of items that are then rendered into notes
 //todo make it so that you can edith the note info like title, image, be it with a right click menu or otherwise.
+//todo newly created textboxes do not auto adjust size.
+//todo ensure graceful handling of multiple sessions on the same account.
+//todo read on security for allowing users to upload their own files.
