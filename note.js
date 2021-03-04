@@ -1,35 +1,34 @@
+const noteTypes = {
+  text: 0,
+  image: 1
+};
+
 class Note {
   constructor({
     content,
-    title
-  } = {
-    content: '',
-    title: 'Note Title'
-  }) {
+    title,
+    type
+  } = {}) {
     this.content = content;
     this.title = title;
+    this.type = type;
   }
-  get textHtml() {
+  get html() {
     return `
-    <span class="note-card">
-      <span class="note-title"><span>${this.title}</span> <i class="material-icons note-menu">more_vert</i>
-      </span>
-      <span class="note-body">
-        <textarea class="text-note" role="textbox" placeholder="Write notes here...">${this.content}</textarea>
-      </span>
-    </span>
-  `
+      <span class="note-card">
+        <span class="note-title">${this.title}</span>
+        <span class="note-body">
+          ${this.bodyHtml}
+        </span>
+      </span>`;
   }
-  get imageHtml() {
-    return `
-    <span class="note-card">
-      <span class="note-title"><span>Image Note</span> <i class="material-icons note-menu">more_vert</i>
-      </span>
-      <span class="note-body">
-        <image src="https://picsum.photos/400/400" class="note-image">
-      </span>
-    </span>
-  `
+  get bodyHtml() {
+    switch (this.type) {
+      case noteTypes.text:
+        return `<textarea class="text-note" role="textbox" placeholder="Write notes here...">${this.content}</textarea>`;
+      case noteTypes.image:
+        return `<image src="https://picsum.photos/400/400" class="note-image">`;
+    }
   }
 };
 
@@ -76,19 +75,33 @@ $(function () {
     //    $(this).val('this is a big phat test'); how to change the value 
   });
 
-  $('.note-image')
-    .wrap('<span style="display:inline-block"></span>')
-    .css('display', 'block')
-    .parent()
-    .zoom({
-      magnify: 1.5
-    });
+  //  $('.note-image')
+  //    .wrap('<span style="display:inline-block"></span>')
+  //    .css('display', 'block')
+  //    .parent()
+  //    .zoom({
+  //      magnify: 1.5
+  //    });
 
   $('#add-text-note').click(() => $($('.note-column')[findSmallestColumn()])
-    .append(new Note().textHtml));
+    .append(new Note({
+      content: '',
+      title: 'new note',
+      type: noteTypes.text
+    }).html).children().last()
+    .children('.note-body').children()
+    .on('input', function () {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight + 1) + 'px';
+      //    $(this).val('this is a big phat test'); how to change the value 
+    }));
 
   $('#add-image-note').click(() => $($('.note-column')[findSmallestColumn()])
-    .append(new Note().imageHtml).children().last()
+    .append(new Note({
+      content: '',
+      title: 'New Image',
+      type: noteTypes.image
+    }).html).children().last()
     .children('.note-body').children()
     //finds the image within the newly created note
     .wrap('<span style="display:inline-block"></span>')

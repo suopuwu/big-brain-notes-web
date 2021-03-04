@@ -370,7 +370,7 @@ input:focus {
   align-items: center;
 }
 
-.note-title > span {
+.note-title {
   font-family: 'Fjalla One', sans-serif;
 
 }
