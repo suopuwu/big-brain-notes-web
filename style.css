@@ -397,6 +397,10 @@ input:focus {
   cursor: pointer;
 }
 
+.note-image + img {
+  cursor: pointer;
+}
+
 .note-body > textarea {
   margin: 0.7vmax;
   width: calc(100% - 1.4vmax);
