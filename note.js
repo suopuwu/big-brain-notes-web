@@ -3,33 +3,59 @@ const noteTypes = {
   image: 1
 };
 
+//returns an ever increasing value, there can be no duplicates because each time it is called, it increases.
+var iterator = function () {
+  let value = 0;
+  return function () {
+    return value++;
+  }
+}()
+
 class Note {
   constructor({
     content,
     title,
     type
   } = {}) {
-    this.content = content;
-    this.title = title;
-    this.type = type;
+    this._content = content;
+    this._title = title;
+    this._type = type;
+    this.id = `${iterator()}${createUUID()}`;
   }
   get html() {
     return `
-      <span class="note-card">
-        <span class="note-title">${this.title}</span>
+      <span class="note-card" id=${this.id}>
+        <span class="note-title">${this._title}</span>
         <span class="note-body">
           ${this.bodyHtml}
         </span>
       </span>`;
   }
   get bodyHtml() {
-    switch (this.type) {
+    switch (this._type) {
       case noteTypes.text:
-        return `<textarea class="text-note" role="textbox" placeholder="Write notes here...">${this.content}</textarea>`;
+        return `<textarea class="text-note" role="textbox" placeholder="Write notes here...">${this._content}</textarea>`;
       case noteTypes.image:
         return `<image src="https://picsum.photos/400/400" class="note-image">`;
     }
   }
+
+  set content(val) {
+    this._content = val;
+    console.log(val);
+  }
+  get content() {
+    return _content;
+  }
+
+  set title(val) {
+    this._content = val;
+    console.log(val);
+  }
+  get title() {
+    return _title;
+  }
+
 };
 
 function popupConfirmHtml({
@@ -86,7 +112,7 @@ $(function () {
   $('#add-text-note').click(() => $($('.note-column')[findSmallestColumn()])
     .append(new Note({
       content: '',
-      title: 'new note',
+      title: 'New Note',
       type: noteTypes.text
     }).html).children().last()
     .children('.note-body').children()
