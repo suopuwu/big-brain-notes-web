@@ -82,6 +82,8 @@ $(function () {
   $('#pss > .tile-button').on('contextmenu', rightClickMenu);
   //changes the internal mode between player and character when a new tab is selected.
   //This matters because the search mode only searches in the active tab.
+
+
   function internalModeSwitch() {
     clearSearch();
     switch ($(this).val()) {
