@@ -19,48 +19,6 @@ $.cssHooks.backgroundColor = {
   }
 }
 
-const suopPopUp = {
-  pop: function (content) {
-    if ($('#suop-popup').length === 0) {
-      $('body').append(`
-      <div style="position:fixed;height:100vh;width:100vw;background-color:rgba(0,0,0,0.5);z-index:1000;transition: all 0.2s;display:flex;justify-content: center;align-items: center;opacity:0;backdrop-filter: blur(3px);" id="suop-popup">
-        <span id="inner-suop-popup" style ="box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);background-color:white;padding: 20px;border-radius:10px;"></span>
-      </div>
-    `);
-      replaceContent();
-      setTimeout(function () {
-        $('#suop-popup').css('opacity', '1');
-      }, 1);
-
-
-      $('#suop-popup').click(function () {
-        suopPopUp.close();
-      });
-      $('#inner-suop-popup').click(function (e) {
-        e.stopPropagation();
-
-      });
-    } else {
-      replaceContent();
-      $('#suop-popup').css('display', 'flex');
-      setTimeout(function () {
-        $('#suop-popup').css('opacity', '1');
-      }, 1);
-    }
-
-    function replaceContent() {
-      $('#inner-suop-popup').html(content);
-    }
-  },
-  close: function () {
-    $('#suop-popup').css('opacity', '0');
-    setTimeout(function () {
-      $('#suop-popup').css('display', 'none');
-    }, 200);
-  }
-
-}
-
 $(function () {
   //    console.log($('#css > .tile-button').attr('id'));
   var charTiles = $('#css > .tile-button');
@@ -198,14 +156,27 @@ $(function () {
 
 
   function removePlayer(e) {
-    $(e.data.hostElement).remove();
     closeRightClickMenu();
+    //creates a popup with rename player content
+    suopPopup.pop(`
+      <div>Are you sure you want to delete this player?</div>
+      <div style="text-align: right;">
+        <a href="javascript:;" class="ripple" id="cancelDelete"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
+        <a href="javascript:;" class="ripple" id="confirmDelete"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
+      </div>
+    `);
+
+    $('#confirmDelete').click(function () {
+      $(e.data.hostElement).remove();
+      suopPopup.close();
+    });
+    $('#cancelDelete').click(() => suopPopup.close());
   }
 
   function renamePlayer(e) {
     closeRightClickMenu();
     //creates a popup with rename player content
-    suopPopUp.pop(`
+    suopPopup.pop(`
       <div>New Name</div>
       <input type="text" id="renameCharacter" autocomplete="off" value="${$('> .name-plate', e.data.hostElement).html()}">
       <div style="text-align: right;">
@@ -233,14 +204,14 @@ $(function () {
         console.log('rejected')
       })
       .finally(function () {
-        suopPopUp.close();
+        suopPopup.close();
       });
   }
 
   function recolorPlayer(e) {
     closeRightClickMenu();
     //creates a popup with rename player content
-    suopPopUp.pop(`
+    suopPopup.pop(`
       <div>New Color</div>
       <input id="recolorPlayer" type="color" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" value="${$(e.data.hostElement).css('background-color')}">
       <div style="text-align: right;">
@@ -262,14 +233,14 @@ $(function () {
         $(e.data.hostElement).css('background-color', value);
       })
       .finally(function () {
-        suopPopUp.close();
+        suopPopup.close();
       });
   }
 
   function reimagePlayer(e) {
     closeRightClickMenu();
     //creates a popup with rename player content
-    suopPopUp.pop(`
+    suopPopup.pop(`
       <div>Choose Your Image</div>
       <input id="reimagePlayer" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" value="${$(e.data.hostElement).css('background-color')}">
       <div style="text-align: right;">
@@ -294,7 +265,7 @@ $(function () {
         $(e.data.hostElement).css('background-color', value);
       })
       .finally(function () {
-        suopPopUp.close();
+        suopPopup.close();
       });
   }
 
