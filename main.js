@@ -1,23 +1,22 @@
 //getting the background color in jquery gives a hex code instead of rgb
 $.cssHooks.backgroundColor = {
   get: function (elem) {
-    if (elem.currentStyle)
-      var bg = elem.currentStyle["backgroundColor"];
+    if (elem.currentStyle) var bg = elem.currentStyle.backgroundColor;
     else if (window.getComputedStyle)
-      var bg = document.defaultView.getComputedStyle(elem,
-        null).getPropertyValue("background-color");
-    if (bg.search("rgb") == -1)
-      return bg;
+      var bg = document.defaultView
+        .getComputedStyle(elem, null)
+        .getPropertyValue('background-color');
+    if (bg.search('rgb') == -1) return bg;
     else {
       bg = bg.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 
       function hex(x) {
-        return ("0" + parseInt(x).toString(16)).slice(-2);
+        return ('0' + parseInt(x).toString(16)).slice(-2);
       }
-      return "#" + hex(bg[1]) + hex(bg[2]) + hex(bg[3]);
+      return '#' + hex(bg[1]) + hex(bg[2]) + hex(bg[3]);
     }
-  }
-}
+  },
+};
 
 $(function () {
   //    console.log($('#css > .tile-button').attr('id'));
@@ -26,21 +25,43 @@ $(function () {
   var allTiles = [charTiles, playerTiles];
   const modes = {
     character: 0,
-    player: 1
+    player: 1,
   };
   var mode = modes.character;
 
   $('input:radio[name="select-screen"]').change(internalModeSwitch);
   $('#search-bar').on('input', pruneSearchTerms);
   $('#css > .tile-button').click(navigateToCharacter);
-  $('#pss > .tile-button').click(navigateToPlayer);
+  //dynamically adds event listeners
+  $('#pss').on('click', '.tile-button', navigateToPlayer)
+    .on('contextmenu', '.tile-button', rightClickMenu);
   $('#search-label-icon').click(clearSearch);
   $('#add-char-fab').click(addPlayer);
 
-  $('#pss > .tile-button').on('contextmenu', rightClickMenu);
   //changes the internal mode between player and character when a new tab is selected.
   //This matters because the search mode only searches in the active tab.
 
+  firebase.auth().onAuthStateChanged(function (user) { //adds player buttons
+    if (user) {
+      //if already logged in
+      var playersRef = database.ref('users/' + user.uid + '/players');
+      playersRef.on('value', (snapshot) => {
+        const players = snapshot.val();
+        console.log(players);
+        for (let key in players) {
+          var player = players[key];
+          $('#pss').append(getTileHtml({
+            name: player.name,
+            id: key,
+            color: player.color,
+            image: player.image
+          }));
+        }
+      });
+      console.log('secondary on authstate changed');
+      $('#pss > .tile-button').click(navigateToPlayer);
+    }
+  });
 
   function internalModeSwitch() {
     clearSearch();
@@ -55,13 +76,19 @@ $(function () {
   }
 
   function navigateToCharacter() {
-    window.location.href = '/characters/' +
-      $(this).attr('id')
+    window.location.href =
+      '/characters/' +
+      $(this)
+      .attr('id')
       .slice(0, $(this).attr('id').length - 5);
   }
 
   function navigateToPlayer() {
-
+    window.location.href =
+      '/players/' +
+      $(this)
+      .attr('id')
+      .slice(0, $(this).attr('id').length - 5);
   }
 
   function pruneSearchTerms(e) {
@@ -74,10 +101,12 @@ $(function () {
     }
 
     allTiles[mode].each(function (index, tile) {
-      if ($(tile) //if a tile contains the search term.
+      if (
+        $(tile) //if a tile contains the search term.
         .attr('id')
         .slice(0, $(tile).attr('id').length - 5) //sliced to remove the -tile
-        .includes(searchQuery)) {
+        .includes(searchQuery)
+      ) {
         $(tile).removeClass('collapsed');
       } else {
         $(tile).addClass('collapsed');
@@ -104,19 +133,25 @@ $(function () {
 
     //menu items
     $('#menuDelete').off('click').click({
-      hostElement: this
-    }, removePlayer);
+        hostElement: this,
+      },
+      removePlayer
+    );
     $('#menuRename').off('click').click({
-      hostElement: this
-    }, renamePlayer);
+        hostElement: this,
+      },
+      renamePlayer
+    );
     $('#menuRecolor').off('click').click({
-      hostElement: this
-    }, recolorPlayer);
+        hostElement: this,
+      },
+      recolorPlayer
+    );
     $('#menuReimage').off('click').click({
-      hostElement: this
-    }, reimagePlayer);
-
-
+        hostElement: this,
+      },
+      reimagePlayer
+    );
 
     //closes menu when user clicks outside of it.
     $('#right-click-menu').on('click', function (e) {
@@ -142,7 +177,6 @@ $(function () {
     `;
 
     $('#pss').append(playerTile);
-    $('#pss > span:last-child').on('contextmenu', rightClickMenu);
     /* TODO structure design:
     
     adding immediately adds dom ui elements in a loading state.
@@ -150,10 +184,7 @@ $(function () {
     The server response adds in the link to the player tile.
     removes loading style
     */
-
   }
-
-
 
   function removePlayer(e) {
     closeRightClickMenu();
@@ -178,7 +209,10 @@ $(function () {
     //creates a popup with rename player content
     suopPopup.pop(`
       <div>New Name</div>
-      <input type="text" id="renameCharacter" autocomplete="off" value="${$('> .name-plate', e.data.hostElement).html()}">
+      <input type="text" id="renameCharacter" autocomplete="off" value="${$(
+        '> .name-plate',
+        e.data.hostElement
+      ).html()}">
       <div style="text-align: right;">
         <a href="javascript:;" class="ripple" id="cancelRename"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
         <a href="javascript:;" class="ripple" id="confirmRename"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
@@ -198,11 +232,15 @@ $(function () {
     });
 
     //handles confirmation/cancellation of the rename
-    text.then(function (value) {
-        $('> .name-plate', e.data.hostElement).html(value);
-      }, function () {
-        console.log('rejected')
-      })
+    text
+      .then(
+        function (value) {
+          $('> .name-plate', e.data.hostElement).html(value);
+        },
+        function () {
+          console.log('rejected');
+        }
+      )
       .finally(function () {
         suopPopup.close();
       });
@@ -213,7 +251,9 @@ $(function () {
     //creates a popup with rename player content
     suopPopup.pop(`
       <div>New Color</div>
-      <input id="recolorPlayer" type="color" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" value="${$(e.data.hostElement).css('background-color')}">
+      <input id="recolorPlayer" type="color" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" value="${$(
+        e.data.hostElement
+      ).css('background-color')}">
       <div style="text-align: right;">
         <a href="javascript:;" class="ripple" id="cancelRecolor"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
         <a href="javascript:;" class="ripple" id="confirmRecolor"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
@@ -225,11 +265,11 @@ $(function () {
     var color = new Promise(function (resolve, reject) {
       $('#confirmRecolor').click(() => resolve($('#recolorPlayer').val()));
       $('#cancelRecolor').click(() => reject());
-
     });
 
     //handles confirmation/cancellation of the rename
-    color.then(function (value) {
+    color
+      .then(function (value) {
         $(e.data.hostElement).css('background-color', value);
       })
       .finally(function () {
@@ -242,7 +282,9 @@ $(function () {
     //creates a popup with rename player content
     suopPopup.pop(`
       <div>Choose Your Image</div>
-      <input id="reimagePlayer" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" value="${$(e.data.hostElement).css('background-color')}">
+      <input id="reimagePlayer" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" value="${$(
+        e.data.hostElement
+      ).css('background-color')}">
       <div style="text-align: right;">
         <a href="javascript:;" class="ripple" id="cancelRecolor"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
         <a href="javascript:;" class="ripple" id="confirmRecolor"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
@@ -254,19 +296,37 @@ $(function () {
     var color = new Promise(function (resolve, reject) {
       $('#confirmRecolor').click(() => resolve($('#recolorPlayer').val()));
       $('#cancelRecolor').click(() => reject());
-
     }); //todo make this integrated with the server.
     //when an image is selected, it is validated so it can't harm the server, then uploaded,
     //then once uploaded the response is sent to the client and the image is put into place.
     //otherwise it gives an error.
 
     //handles confirmation/cancellation of the rename
-    color.then(function (value) {
+    color
+      .then(function (value) {
         $(e.data.hostElement).css('background-color', value);
       })
       .finally(function () {
         suopPopup.close();
       });
+  }
+
+  function getTileHtml({
+    name,
+    color,
+    number,
+    image,
+    id
+  } = {}) {
+    return `
+      <span class="tile-button" id="${id}-tile" style="background-color: #${color}">
+        ${number ? '<span class="background-number">' + number + '</span>' : ''}
+        <span class="character-image" style="background-image: url('${image}');"></span>
+        <span class="name-plate">${name}</span>
+        ${number? `<span class="foreground-number"><span class="inner-foreground-number"><span>` + number + `</span></span>`: ''}
+        </span>
+      </span>
+    `;
   }
 
   function getRandomColor() {

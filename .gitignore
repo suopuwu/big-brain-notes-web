@@ -12,3 +12,4 @@ Cargo.lock
 .todo
 .jshintrc
 .vscode/launch.json
+.vscode/settings.json
