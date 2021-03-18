@@ -74,6 +74,40 @@ h1 {
   border-top: none;
 }
 
+.flex-grow-spacer {
+  flex-grow: 1;
+}
+
+#sign-in-button {
+  display: flex;
+  border-radius: 10px;
+  justify-content: space-between;
+  padding: 15px;
+  align-items: center;
+  cursor: pointer;
+  background-color: #cfd8dc;
+  transition: all 0.2s;
+  width: calc(100% - 30px);
+}
+
+#sign-in-button > span {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+
+#sign-in-button:hover {
+  background-color: #9ea7aa;
+}
+
+.profile-picture {
+  width: 40px;
+  margin-right: 10px;
+  border-radius: 40px;
+}
+
+
 /*select screens*/
 .select-screens > input {
   display: none;
@@ -300,6 +334,10 @@ input:focus {
   transform: scale(0);
 }
 
+.display-none {
+  display: none;
+}
+
 #right-click-menu {
   display: flex;
   position: absolute;
@@ -331,6 +369,19 @@ input:focus {
   padding-right: 0;
 }
 
+.loading-icon {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /*character styles*/
 .main-container {

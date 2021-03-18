@@ -9,8 +9,6 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="icon" href="images/logo.png">
   <link rel="stylesheet" href="lib/ripple.css">
-  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
-  <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="lib/suopLib.js"></script>
   <script src="main.js"></script>
@@ -35,7 +33,10 @@
     </span>
     <h1>Rename Player</h1>
     To rename a player, right click their tile.
-    <a href="javascript:;" class="ripple" id="sign-in-button">Sign in.</a>
+    <div class="flex-grow-spacer"></div>
+    <span id="sign-in-button">
+      Loading... <i class="material-icons loading-icon">refresh</i>
+    </span>
   </div>
   <div class="select-screens">
     <input type="radio" name="select-screen" id="css-radio" value="character" checked>
@@ -82,42 +83,9 @@
 
 
     <div class="tile-holder" id="pss">
-      <span class="tile-button" id="warion-tile">
-        <span class="background-number">12</span>
-        <span class="character-image" style="background-image: url('http://picsum.photos/500/500/');"></span>
-        <span class="name-plate">warion</span>
-        <span class="foreground-number">
-          <span class="inner-foreground-number"><span>7</span></span><span></span>
-        </span>
-      </span>
-      <span class="tile-button" id="mario-tile">
-        <span class="background-number">74e</span>
-        <span class="character-image" style="background-image: url('images/min%20min.png');"></span>
-        <span class="name-plate">mario</span>
-        <span class="foreground-number">
-          <span class="inner-foreground-number"><span>74e</span></span><span></span>
-        </span>
-      </span>
-      <span class="tile-button" id="squirtio-tile">
-        <span class="background-number">7</span>
-        <span class="character-image" style="background-image: url('http://picsum.photos/400/200/');"></span>
-        <span class="name-plate">squirtio</span>
-        <span class="foreground-number">
-          <span class="inner-foreground-number"><span>32</span></span><span></span>
-        </span>
-      </span>
-      <span class="tile-button" id="bob-tile">
-        <span class="background-number">♥</span>
-        <span class="character-image" style="background-image: url('http://picsum.photos/400/400/');"></span>
-        <span class="name-plate">bob</span>
-        <span class="foreground-number">
-          <span class="inner-foreground-number"><span>3</span></span><span></span>
-        </span>
-      </span>
     </div>
     <div class="fab" id="add-char-fab"> + </div>
   </div>
-
 
   <!-- The core Firebase JS SDK is always required and must be listed first -->
   <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-app.js"></script>
@@ -126,6 +94,7 @@
      https://firebase.google.com/docs/web/setup#available-libraries -->
   <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-analytics.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-database.js"></script>
 
 
   <script>
@@ -144,9 +113,9 @@
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
-
   </script>
   <script src="/lib/auth.js"></script>
+  <script src="/lib/database.js"></script>
 
 </body>
 

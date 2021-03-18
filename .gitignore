@@ -10,3 +10,5 @@ Cargo.lock
 **/*.rs.bk
 .brackets.json
 .todo
+.jshintrc
+.vscode/launch.json
