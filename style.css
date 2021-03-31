@@ -70,7 +70,7 @@ h1 {
 }
 
 
-.nav-menu > h1:first-of-type {
+.nav-menu>h1:first-of-type {
   border-top: none;
 }
 
@@ -90,7 +90,7 @@ h1 {
   width: calc(100% - 30px);
 }
 
-#sign-in-button > span {
+#sign-in-button>span {
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -109,7 +109,7 @@ h1 {
 
 
 /*select screens*/
-.select-screens > input {
+.select-screens>input {
   display: none;
 }
 
@@ -124,23 +124,23 @@ h1 {
   user-select: none;
 }
 
-#css-radio:checked ~ #css-tab {
+#css-radio:checked~#css-tab {
   background-color: #1b1b1b;
   color: white;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   cursor: default;
 }
 
-#pss-radio:checked ~ #pss-tab {
+#pss-radio:checked~#pss-tab {
   background-color: #1b1b1b;
   color: white;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   cursor: default;
 }
 
-#css-radio:checked ~ #pss,
-#pss-radio:checked ~ #css,
-#css-radio:checked ~ #add-char-fab {
+#css-radio:checked~#pss,
+#pss-radio:checked~#css,
+#css-radio:checked~#add-char-fab {
   display: none;
 }
 
@@ -174,7 +174,7 @@ input:focus {
 /*char tiles*/
 .tile-button {
   box-shadow: 0 0 0 rgba(0, 0, 0, 0.12), 0 0 0 rgba(0, 0, 0, 0.24);
-  transition: all 0.5s cubic-bezier(.25, .8, .25, 1);
+  transition: all 0.5s;
   display: inline-block;
   width: 16.666%;
   z-index: 0;
@@ -193,7 +193,7 @@ input:focus {
   z-index: 420;
 }
 
-.tile-button > .character-image {
+.tile-button>.character-image {
 
   width: 100%;
   display: inline-block;
@@ -202,13 +202,13 @@ input:focus {
   background-position: center;
 }
 
-.tile-button > .character-image:after {
+.tile-button>.character-image:after {
   content: "";
   display: block;
   padding-bottom: 100%;
 }
 
-.tile-button > .background-number {
+.tile-button>.background-number {
   position: absolute;
   align-self: center;
   font-family: 'Fjalla One', sans-serif;
@@ -216,7 +216,7 @@ input:focus {
   color: rgba(0, 0, 0, 0.4)
 }
 
-.tile-button > .name-plate {
+.tile-button>.name-plate {
   width: calc(100% - 6px);
   font-family: 'Fjalla One', sans-serif;
   background-color: rgba(0, 0, 0, 0.9);
@@ -226,14 +226,15 @@ input:focus {
   font-size: 2vw;
   position: absolute;
   text-transform: uppercase;
+  word-wrap: break-word;
 }
 
-.tile-button > .foreground-number {
+.tile-button>.foreground-number {
   display: flex;
   flex-flow: row;
 }
 
-.inner-foreground-number > span {
+.inner-foreground-number>span {
   background-color: rgba(0, 0, 0, 0.9);
   font-family: 'Fjalla One', sans-serif;
   font-size: 1.4vw;
@@ -246,7 +247,7 @@ input:focus {
   z-index: 1;
 }
 
-.tile-button > .foreground-number:last-child {
+.tile-button>.foreground-number:last-child {
   flex-grow: 1;
 }
 
@@ -338,6 +339,10 @@ input:focus {
   display: none;
 }
 
+.invisible {
+  opacity: 0;
+}
+
 #right-click-menu {
   display: flex;
   position: absolute;
@@ -351,7 +356,7 @@ input:focus {
   transform-origin: top left;
 }
 
-#right-click-menu > a {
+#right-click-menu>a {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -361,11 +366,11 @@ input:focus {
   overflow: hidden;
 }
 
-#right-click-menu > a > i {
+#right-click-menu>a>i {
   padding-right: 10px;
 }
 
-#right-click-menu > a > i:empty {
+#right-click-menu>a>i:empty {
   padding-right: 0;
 }
 
@@ -426,7 +431,7 @@ input:focus {
 
 }
 
-.note-title > i {
+.note-title>i {
   font-size: 1.3em;
 }
 
@@ -439,7 +444,7 @@ input:focus {
   width: 100%;
 }
 
-.note-body > span {
+.note-body>span {
   width: 100%;
 }
 
@@ -448,11 +453,11 @@ input:focus {
   cursor: pointer;
 }
 
-.note-image + img {
+.note-image+img {
   cursor: pointer;
 }
 
-.note-body > textarea {
+.note-body>textarea {
   margin: 0.7vmax;
   width: calc(100% - 1.4vmax);
   font-size: 12px;
@@ -464,7 +469,7 @@ input:focus {
 
 }
 
-.note-body > textarea:focus {
+.note-body>textarea:focus {
   outline: none;
   border-bottom: solid 1px #212121;
 }

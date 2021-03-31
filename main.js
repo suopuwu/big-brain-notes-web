@@ -45,24 +45,36 @@ $(function () {
     if (user) {
       //if already logged in
       var playersRef = database.ref('users/' + user.uid + '/players');
+      //on value change
       playersRef.on('value', (snapshot) => {
         const players = snapshot.val();
-        console.log(players);
         for (let key in players) {
           var player = players[key];
-          $('#pss').append(getTileHtml({
+          var tileHtml = getTileHtml({
             name: player.name,
             id: key,
             color: player.color,
-            image: player.image
-          }));
+            image: 'images/logo.png',
+          });
+          if ($('#' + key + '-tile').length > 0) {
+            //if the element has already been added, replace the existing one's subelements
+
+            $('#' + key + '-tile > .name-plate').html(player.name);
+            $('#' + key + '-tile').css('background-color', player.color);
+          } else {
+            //otherwise, add a new one.
+            $('#pss').append(tileHtml);
+            $('#' + key + '-tile')
+              .data('imagePath', player.image).fadeIn().removeClass('invisible');
+            loadAndChangeImage(player, key);
+          }
         }
       });
-      console.log('secondary on authstate changed');
       $('#pss > .tile-button').click(navigateToPlayer);
     }
   });
 
+  //todo it does not do anything when a character is deleted on the server. May have to fix this.
   function internalModeSwitch() {
     clearSearch();
     switch ($(this).val()) {
@@ -169,28 +181,19 @@ $(function () {
   }
 
   function addPlayer() {
-    const playerTile = `
-    <span class="tile-button" id="mario-tile" style="background-color: #${getRandomColor()};">
-      <span class="character-image" style="background-image: url('images/min%20min.png');"></span>
-      <span class="name-plate">Player</span>
-    </span>
-    `;
-
-    $('#pss').append(playerTile);
-    /* TODO structure design:
-    
-    adding immediately adds dom ui elements in a loading state.
-    pings server to generate uuid and create entry in database. 
-    The server response adds in the link to the player tile.
-    removes loading style
-    */
+    var newTileRef = database.ref('users/' + user.uid + '/players').push({
+      name: 'New Player',
+      color: getRandomColor()
+    });
   }
 
   function removePlayer(e) {
+    var domId = $(e.data.hostElement).attr('id');
+    var id = domId.substring(0, domId.length - 5);
     closeRightClickMenu();
     //creates a popup with rename player content
     suopPopup.pop(`
-      <div>Are you sure you want to delete this player?</div>
+      <div>Are you sure you want to delete this player? This cannot be undone.</div>
       <div style="text-align: right;">
         <a href="javascript:;" class="ripple" id="cancelDelete"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
         <a href="javascript:;" class="ripple" id="confirmDelete"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
@@ -198,6 +201,17 @@ $(function () {
     `);
 
     $('#confirmDelete').click(function () {
+      try {
+        storageRef.child($(e.data.hostElement).data('imagePath')).delete().then(function () {
+          console.log('image deleted');
+        });
+      } catch (err) {
+        if ($(e.data.hostElement).data('imagePath') !== undefined) {
+          //if there was actually an image to delete but an error happened.
+          console.error(err);
+        }
+      }
+      database.ref('users/' + user.uid + '/players/' + id).remove();
       $(e.data.hostElement).remove();
       suopPopup.close();
     });
@@ -205,6 +219,8 @@ $(function () {
   }
 
   function renamePlayer(e) {
+    var domId = $(e.data.hostElement).attr('id');
+    var id = domId.substring(0, domId.length - 5);
     closeRightClickMenu();
     //creates a popup with rename player content
     suopPopup.pop(`
@@ -235,7 +251,8 @@ $(function () {
     text
       .then(
         function (value) {
-          $('> .name-plate', e.data.hostElement).html(value);
+          database.ref('users/' + user.uid + '/players/' + id + '/name')
+            .set(value);
         },
         function () {
           console.log('rejected');
@@ -247,7 +264,10 @@ $(function () {
   }
 
   function recolorPlayer(e) {
+    var domId = $(e.data.hostElement).attr('id');
+    var id = domId.substring(0, domId.length - 5);
     closeRightClickMenu();
+
     //creates a popup with rename player content
     suopPopup.pop(`
       <div>New Color</div>
@@ -270,7 +290,8 @@ $(function () {
     //handles confirmation/cancellation of the rename
     color
       .then(function (value) {
-        $(e.data.hostElement).css('background-color', value);
+        database.ref('users/' + user.uid + '/players/' + id + '/color')
+          .set(value);
       })
       .finally(function () {
         suopPopup.close();
@@ -278,33 +299,66 @@ $(function () {
   }
 
   function reimagePlayer(e) {
+    var domId = $(e.data.hostElement).attr('id');
+    var id = domId.substring(0, domId.length - 5);
     closeRightClickMenu();
     //creates a popup with rename player content
     suopPopup.pop(`
-      <div>Choose Your Image</div>
+      <div>Choose Your Image (1MB limit)</div>
       <input id="reimagePlayer" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" value="${$(
         e.data.hostElement
-      ).css('background-color')}">
+      ).css('background-color')}" accept="image/png, image/jpeg, image/gif, image/jpg, image/webp"
+      accept="image/png, image/jpeg" >
       <div style="text-align: right;">
-        <a href="javascript:;" class="ripple" id="cancelRecolor"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
-        <a href="javascript:;" class="ripple" id="confirmRecolor"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
+        <a href="javascript:;" class="ripple" id="cancelReimage"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
+        <a href="javascript:;" class="ripple" id="confirmReimage"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
       </div>
     `);
-
-    $('#confirmRecolor').focus();
     //awaits the color entered.
-    var color = new Promise(function (resolve, reject) {
-      $('#confirmRecolor').click(() => resolve($('#recolorPlayer').val()));
-      $('#cancelRecolor').click(() => reject());
-    }); //todo make this integrated with the server.
+    var image = new Promise(function (resolve, reject) {
+      $('#confirmReimage').click(() => resolve($('#reimagePlayer').val()));
+      $('#cancelReimage').click(() => reject());
+    });
+    //TODO make this integrated with the server.
     //when an image is selected, it is validated so it can't harm the server, then uploaded,
     //then once uploaded the response is sent to the client and the image is put into place.
     //otherwise it gives an error.
-
+    //TODO validation
+    //TODO make it so that users can use image urls and the images are downloaded automatically.
+    //TODO polish ui for uploading
     //handles confirmation/cancellation of the rename
-    color
-      .then(function (value) {
-        $(e.data.hostElement).css('background-color', value);
+    image.then(function (fileName) {
+
+        var file = $('#reimagePlayer')[0].files[0];
+        var imageHtml = `
+          <span class="character-image" id="${id}-image" style="display: none; background-image: url(${URL.createObjectURL(file)})"></span>
+          `;
+
+        //updates profile picture in storage
+        var uploadIndicator = $.mSnackbar({
+          text: 'Uploading <i id="upload-percentage">0</i>%',
+          lifeSpan: Infinity
+        })
+        var imageUpload = storageRef.child(
+          `users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`
+        ).put(file);
+        imageUpload.on('state_changed', (snapshot) => {
+          console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          $('#upload-percentage').html(Math.trunc(progress));
+        });
+        imageUpload.then((snapshot) => {
+          console.log('Uploaded photo!');
+          setTimeout(() => uploadIndicator.close(), 1000)
+        });
+
+        //updates path to picture in database
+        database.ref('users/' + user.uid + '/players/' + id + '/image')
+          .set(`users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`);
+
+        //changes html to match
+        $('#' + domId + '> .character-image').replaceWith(imageHtml);
+        $('#' + domId + '> .character-image').fadeIn();
       })
       .finally(function () {
         suopPopup.close();
@@ -316,12 +370,12 @@ $(function () {
     color,
     number,
     image,
-    id
+    id,
   } = {}) {
     return `
-      <span class="tile-button" id="${id}-tile" style="background-color: #${color}">
+      <span class="tile-button invisible" id="${id}-tile" style="background-color: ${color}; display: none;">
         ${number ? '<span class="background-number">' + number + '</span>' : ''}
-        <span class="character-image" style="background-image: url('${image}');"></span>
+        <span class="character-image" id="${id}-image" style="display: none"></span>
         <span class="name-plate">${name}</span>
         ${number? `<span class="foreground-number"><span class="inner-foreground-number"><span>` + number + `</span></span>`: ''}
         </span>
@@ -336,5 +390,27 @@ $(function () {
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+  }
+
+  function loadAndChangeImage(player, id) {
+    if (player.image && !player.image.includes('http')) {
+      //if string is not a path to firebase storage
+      storageRef.child(
+          player.image
+        ).getDownloadURL()
+        .then((url) => {
+          preloadImage(url).then((image) => {
+            $('#' + id + '-image').css('background-image',
+              `url('${url}')`).fadeIn();
+          });
+        }).catch((error) => {
+          console.log(error);
+        });
+    } else {
+      preloadImage(player.image).then((image) => {
+        $('#' + id + '-image').css('background-image',
+          `url('${player.image}')`).fadeIn();
+      });
+    }
   }
 });
