@@ -1,0 +1,18 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [{
+
+      "source": "/foo{,/**}",
+      "destination": "/mario.html"
+    }, {
+      "regex": "/foo(/.*)?",
+      "destination": "/mario.html"
+    }]
+  }
+}
