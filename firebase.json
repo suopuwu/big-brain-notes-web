@@ -7,12 +7,17 @@
       "**/node_modules/**"
     ],
     "rewrites": [{
-
-      "source": "/foo{,/**}",
-      "destination": "/mario.html"
+      "source": "/player/**",
+      "destination": "/note-page.html"
     }, {
-      "regex": "/foo(/.*)?",
-      "destination": "/mario.html"
+      "regex": "/player(/.*)?",
+      "destination": "/note-page.html"
+    }, {
+      "source": "/character/**",
+      "destination": "/note-page.html"
+    }, {
+      "regex": "/character(/.*)?",
+      "destination": "/note-page.html"
     }]
   }
 }

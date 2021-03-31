@@ -89,7 +89,7 @@ $(function () {
 
   function navigateToCharacter() {
     window.location.href =
-      '/characters/' +
+      '/character/' +
       $(this)
       .attr('id')
       .slice(0, $(this).attr('id').length - 5);
@@ -97,7 +97,7 @@ $(function () {
 
   function navigateToPlayer() {
     window.location.href =
-      '/players/' +
+      '/player/' +
       $(this)
       .attr('id')
       .slice(0, $(this).attr('id').length - 5);
@@ -338,7 +338,7 @@ $(function () {
         var uploadIndicator = $.mSnackbar({
           text: 'Uploading <i id="upload-percentage">0</i>%',
           lifeSpan: Infinity
-        })
+        });
         var imageUpload = storageRef.child(
           `users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`
         ).put(file);

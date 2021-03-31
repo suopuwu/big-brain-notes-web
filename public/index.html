@@ -7,12 +7,12 @@
   <title>Big Brain Notes</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="icon" href="images/logo.png">
+  <link rel="icon" href="/images/logo.png">
   <link rel="stylesheet" href="lib/ripple.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="lib/mSnackbar.min.js"></script>
-  <script src="lib/suopLib.js"></script>
-  <script src="main.js"></script>
+  <script src="/lib/mSnackbar.min.js"></script>
+  <script src="/lib/suopLib.js"></script>
+  <script src="/main.js"></script>
   <!--  see bigBrainNotes.com/licenses for information on the libraries used and their licenses -->
 </head>
 
@@ -39,7 +39,8 @@
       Loading... <i class="material-icons loading-icon">refresh</i>
     </span>
   </div>
-  <div class="select-screens">
+  <div class="select-screens loader">LOADING</div>
+  <div class="select-screens display-none">
     <input type="radio" name="select-screen" id="css-radio" value="character" checked>
     <input type="radio" name="select-screen" id="pss-radio" value="player">
     <label class="ss-tab ripple" id="css-tab" for="css-radio">CHARACTER</label>

@@ -388,6 +388,15 @@ input:focus {
   }
 }
 
+.loader {
+  background-color: #000;
+  display: flex;
+  align-content: center;
+  color: white;
+  font-size: 100px;
+  font-family: 'Fjalla One', sans-serif;
+}
+
 /*character styles*/
 .main-container {
   flex-grow: 1;
