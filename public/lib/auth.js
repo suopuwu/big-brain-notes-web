@@ -75,7 +75,9 @@ $(function () {
       console.log("current user above");
       window.user = user;
       switchLoginLogout(user);
+      authStateChangedUi(true);
     } else {
+      authStateChangedUi(false);
       window.user = null;
       console.log("no user");
       switchLoginLogout();
@@ -248,6 +250,25 @@ $(function () {
       .catch(function (error) {
         $("#reset-password").off().html(error.message);
       });
+  }
+
+  //this isn't universal, requires html to be setup in a specific way.
+  function authStateChangedUi(userExists) {
+    switch (userExists) {
+      case true:
+        $('#main-loader').fadeOut(100, function () {
+
+          $('.main-container').fadeIn();
+        });
+        break;
+      case false:
+        $('.main-container').fadeOut(100, function () {
+          $('#main-loader').fadeIn();
+          $('#loading-text').html(`
+                PLEASE<h3>LOGIN</h3>`);
+        });
+        break;
+    }
   }
 });
 

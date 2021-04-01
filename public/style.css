@@ -378,6 +378,8 @@ input:focus {
 
 .loading-icon {
   animation: spin 1s infinite linear;
+  display: flex;
+  align-items: center;
 }
 
 @keyframes spin {
@@ -388,17 +390,6 @@ input:focus {
   to {
     transform: rotate(360deg);
   }
-}
-
-.loader {
-  background-color: #000;
-  display: flex;
-  flex-flow: column;
-  justify-items: center;
-  align-items: center;
-  color: white;
-  font-family: 'Fjalla One', sans-serif;
-  font-size: 50px;
 }
 
 .loader>h3 {

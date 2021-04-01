@@ -155,9 +155,9 @@ var preloadImage = function (src, callback) {
     var imageLoader = new Image();
     imageLoader.onload = function () {
       resolve(imageLoader);
-    }
+    };
     imageLoader.src = src;
 
   });
   return image;
-}
+};

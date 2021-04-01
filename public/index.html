@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="icon" href="/images/logo.png">
   <link rel="stylesheet" href="lib/ripple.css">
+  <link rel="stylesheet" href="/loader.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="/lib/mSnackbar.min.js"></script>
   <script src="/lib/suopLib.js"></script>
@@ -39,8 +40,14 @@
       Loading... <i class="material-icons loading-icon">refresh</i>
     </span>
   </div>
-  <div class="select-screens loader" id="main-loader">
-    <h3>LOADING...</h3>
+  <div class="loader" id="main-loader">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>
+    <div id="loading-text">
+
+      <h3>LOADING...</h3>
+    </div>
   </div>
   <div class="select-screens" id="main-select-screen" style="display:none">
     <input type="radio" name="select-screen" id="css-radio" value="character" checked>

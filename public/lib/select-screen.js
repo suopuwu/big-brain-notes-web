@@ -54,7 +54,6 @@ $(function () {
             name: player.name,
             id: key,
             color: player.color,
-            image: 'images/logo.png',
           });
           if ($('#' + key + '-tile').length > 0) {
             //if the element has already been added, replace the existing one's subelements
@@ -71,27 +70,10 @@ $(function () {
         }
       });
       $('#pss > .tile-button').click(navigateToPlayer);
-      authStateChangedUi(true);
-    } else {
-      authStateChangedUi(false);
-    }
+    } else {}
   });
 
-  function authStateChangedUi(userExists) {
-    switch (userExists) {
-      case true:
-        $('#main-loader').fadeOut(100, function () {
 
-          $('#main-select-screen').fadeIn();
-        });
-        break;
-      case false:
-        $('#main-select-screen').fadeOut(100, function () {
-          $('#main-loader').html('PLEASE<h3>LOGIN</h3>').fadeIn();
-        });
-        break;
-    }
-  }
 
   //todo it does not do anything when a character is deleted on the server. May have to fix this.
   function internalModeSwitch() {
@@ -394,7 +376,9 @@ $(function () {
     return `
       <span class="tile-button invisible" id="${id}-tile" style="background-color: ${color}; display: none;">
         ${number ? '<span class="background-number">' + number + '</span>' : ''}
-        <span class="character-image" id="${id}-image" style="display: none"></span>
+        <span class="character-image" id="${id}-image" style=""></span>
+        <i class="material-icons loading-icon"
+        style="display:flex; align-content:center; font-size: 3em;" id="${id}-loader"> refresh </i>
         <span class="name-plate">${name}</span>
         ${number? `<span class="foreground-number"><span class="inner-foreground-number"><span>` + number + `</span></span>`: ''}
         </span>
@@ -419,14 +403,20 @@ $(function () {
         ).getDownloadURL()
         .then((url) => {
           preloadImage(url).then((image) => {
+            $('#' + id + '-loader').fadeOut(100, function () {
+              $(this).remove();
+            });
             $('#' + id + '-image').css('background-image',
-              `url('${url}')`).fadeIn();
+              `url('${url}')`).css('display', 'none').fadeIn();
           });
         }).catch((error) => {
           console.log(error);
         });
     } else {
       preloadImage(player.image).then((image) => {
+        $('#' + id + '-loader').fadeOut(100, function () {
+          $(this).remove();
+        });
         $('#' + id + '-image').css('background-image',
           `url('${player.image}')`).fadeIn();
       });
