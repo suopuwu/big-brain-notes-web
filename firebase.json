@@ -7,16 +7,16 @@
       "**/node_modules/**"
     ],
     "rewrites": [{
-      "source": "/player/**",
+      "source": "/players/**",
       "destination": "/note-page.html"
     }, {
-      "regex": "/player(/.*)?",
+      "regex": "/players(/.*)?",
       "destination": "/note-page.html"
     }, {
-      "source": "/character/**",
+      "source": "/characters/**",
       "destination": "/note-page.html"
     }, {
-      "regex": "/character(/.*)?",
+      "regex": "/characters(/.*)?",
       "destination": "/note-page.html"
     }]
   }

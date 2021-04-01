@@ -1,4 +1,4 @@
-//getting the background color in jquery gives a hex code instead of rgb
+//#region getting the background color in jquery gives a hex code instead of rgb
 $.cssHooks.backgroundColor = {
   get: function (elem) {
     if (elem.currentStyle) var bg = elem.currentStyle.backgroundColor;
@@ -17,9 +17,9 @@ $.cssHooks.backgroundColor = {
     }
   },
 };
-
+//#endregion
 $(function () {
-  //    console.log($('#css > .tile-button').attr('id'));
+  //#region initialization variables
   var charTiles = $('#css > .tile-button');
   var playerTiles = $('#pss > .tile-button');
   var allTiles = [charTiles, playerTiles];
@@ -28,8 +28,11 @@ $(function () {
     player: 1,
   };
   var mode = modes.character;
-
+  //#endregion
+  //#region event listeners
   $('input:radio[name="select-screen"]').change(internalModeSwitch);
+  //changes the internal mode between player and character when a new tab is selected.
+  //This matters because the search mode only searches in the active tab.
   $('#search-bar').on('input', pruneSearchTerms);
   $('#css > .tile-button').click(navigateToCharacter);
   //dynamically adds event listeners
@@ -37,10 +40,7 @@ $(function () {
     .on('contextmenu', '.tile-button', rightClickMenu);
   $('#search-label-icon').click(clearSearch);
   $('#add-char-fab').click(addPlayer);
-
-  //changes the internal mode between player and character when a new tab is selected.
-  //This matters because the search mode only searches in the active tab.
-
+  //#endregion
   firebase.auth().onAuthStateChanged(function (user) { //adds player buttons
     if (user) {
       //if already logged in
@@ -71,8 +71,27 @@ $(function () {
         }
       });
       $('#pss > .tile-button').click(navigateToPlayer);
+      authStateChangedUi(true);
+    } else {
+      authStateChangedUi(false);
     }
   });
+
+  function authStateChangedUi(userExists) {
+    switch (userExists) {
+      case true:
+        $('#main-loader').fadeOut(100, function () {
+
+          $('#main-select-screen').fadeIn();
+        });
+        break;
+      case false:
+        $('#main-select-screen').fadeOut(100, function () {
+          $('#main-loader').html('PLEASE<h3>LOGIN</h3>').fadeIn();
+        });
+        break;
+    }
+  }
 
   //todo it does not do anything when a character is deleted on the server. May have to fix this.
   function internalModeSwitch() {
@@ -89,7 +108,7 @@ $(function () {
 
   function navigateToCharacter() {
     window.location.href =
-      '/character/' +
+      '/characters/' +
       $(this)
       .attr('id')
       .slice(0, $(this).attr('id').length - 5);
@@ -97,7 +116,7 @@ $(function () {
 
   function navigateToPlayer() {
     window.location.href =
-      '/player/' +
+      '/players/' +
       $(this)
       .attr('id')
       .slice(0, $(this).attr('id').length - 5);

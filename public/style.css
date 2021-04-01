@@ -20,6 +20,7 @@ body {
   display: grid;
   grid-template-columns: 19vmax auto;
   overflow-x: hidden;
+  background-color: black;
 }
 
 a {
@@ -122,6 +123,7 @@ h1 {
   color: #515151;
   cursor: pointer;
   user-select: none;
+  background-color: white;
 }
 
 #css-radio:checked~#css-tab {
@@ -336,7 +338,7 @@ input:focus {
 }
 
 .display-none {
-  display: none;
+  display: none !important;
 }
 
 .invisible {
@@ -391,10 +393,16 @@ input:focus {
 .loader {
   background-color: #000;
   display: flex;
-  align-content: center;
+  flex-flow: column;
+  justify-items: center;
+  align-items: center;
   color: white;
-  font-size: 100px;
   font-family: 'Fjalla One', sans-serif;
+  font-size: 50px;
+}
+
+.loader>h3 {
+  font-size: 2em;
 }
 
 /*character styles*/
