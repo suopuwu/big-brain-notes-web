@@ -70,10 +70,30 @@ $(function () {
         }
       });
       $('#pss > .tile-button').click(navigateToPlayer);
-    } else {}
+      authStateChangedUi(true);
+    } else {
+      authStateChangedUi(false);
+    }
   });
 
+  //this isn't universal, requires html to be setup in a specific way.
+  function authStateChangedUi(userExists) {
+    switch (userExists) {
+      case true:
+        $('#main-loader').fadeOut(100, function () {
 
+          $('#main-select-screen').fadeIn();
+        });
+        break;
+      case false:
+        $('#main-select-screen').fadeOut(100, function () {
+          $('#main-lmain-select-screenoader').fadeIn();
+          $('#loading-text').html(`
+                PLEASE<h3>LOGIN</h3>`);
+        });
+        break;
+    }
+  }
 
   //todo it does not do anything when a character is deleted on the server. May have to fix this.
   function internalModeSwitch() {
@@ -249,19 +269,17 @@ $(function () {
     });
 
     //handles confirmation/cancellation of the rename
-    text
-      .then(
-        function (value) {
-          database.ref('users/' + user.uid + '/players/' + id + '/name')
-            .set(value);
-        },
-        function () {
-          console.log('rejected');
-        }
-      )
-      .finally(function () {
-        suopPopup.close();
-      });
+    text.then(
+      function (value) {
+        database.ref('users/' + user.uid + '/players/' + id + '/name')
+          .set(value);
+      },
+      function () {
+        console.log('rejected');
+      }
+    ).finally(function () {
+      suopPopup.close();
+    });
   }
 
   function recolorPlayer(e) {
@@ -306,10 +324,7 @@ $(function () {
     //creates a popup with rename player content
     suopPopup.pop(`
       <div>Choose Your Image (1MB limit)</div>
-      <input id="reimagePlayer" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" value="${$(
-        e.data.hostElement
-      ).css('background-color')}" accept="image/png, image/jpeg, image/gif, image/jpg, image/webp"
-      accept="image/png, image/jpeg" >
+      <input id="reimagePlayer" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" accept="image/png, image/jpeg, image/gif, image/jpg, image/webp">
       <div style="text-align: right;">
         <a href="javascript:;" class="ripple" id="cancelReimage"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
         <a href="javascript:;" class="ripple" id="confirmReimage"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
@@ -321,10 +336,6 @@ $(function () {
       $('#cancelReimage').click(() => reject());
     });
     //TODO make this integrated with the server.
-    //when an image is selected, it is validated so it can't harm the server, then uploaded,
-    //then once uploaded the response is sent to the client and the image is put into place.
-    //otherwise it gives an error.
-    //TODO validation
     //TODO make it so that users can use image urls and the images are downloaded automatically.
     //TODO polish ui for uploading
     //handles confirmation/cancellation of the rename
@@ -396,6 +407,7 @@ $(function () {
   }
 
   function loadAndChangeImage(player, id) {
+    //todo clean this garbo up
     if (player.image && !player.image.includes('http')) {
       //if string is not a path to firebase storage
       storageRef.child(
