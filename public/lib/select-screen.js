@@ -335,8 +335,6 @@ $(function () {
       $('#confirmReimage').click(() => resolve($('#reimagePlayer').val()));
       $('#cancelReimage').click(() => reject());
     });
-    //TODO make this integrated with the server.
-    //TODO make it so that users can use image urls and the images are downloaded automatically.
     //TODO polish ui for uploading
     //handles confirmation/cancellation of the rename
     image.then(function (fileName) {
@@ -346,7 +344,7 @@ $(function () {
           <span class="character-image" id="${id}-image" style="display: none; background-image: url(${URL.createObjectURL(file)})"></span>
           `;
 
-        //updates profile picture in storage
+        //#region updates profile picture in storage
         var uploadIndicator = $.mSnackbar({
           text: 'Uploading <i id="upload-percentage">0</i>%',
           lifeSpan: Infinity
@@ -363,12 +361,12 @@ $(function () {
           console.log('Uploaded photo!');
           setTimeout(() => uploadIndicator.close(), 1000)
         });
-
+        //#endregion
         //updates path to picture in database
         database.ref('users/' + user.uid + '/players/' + id + '/image')
           .set(`users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`);
 
-        //changes html to match
+        //instantly changes html to match the uploading image
         $('#' + domId + '> .character-image').replaceWith(imageHtml);
         $('#' + domId + '> .character-image').fadeIn();
       })

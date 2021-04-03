@@ -26,6 +26,8 @@ $(function () {
       this.id = id;
       this.title = title;
     }
+
+    //generates html for a note
     get html() {
       return `
         <span class="note-card" style="display:none" id="${this.id}-note">
@@ -40,23 +42,55 @@ $(function () {
         case noteTypes.text:
           return `<textarea class="text-note" role="textbox" placeholder="Write notes here..." data-key="${this.id}">${this._content}</textarea>`;
         case noteTypes.image:
+          //if the image is not set, make the ui show a button to add an image
           if (this.content === '') {
             return `<button class="mdl-button mdl-js-button mdl-button--flat mdl-js-ripple-effect add-note-image-placeholder" style="width:calc(100% - 40px); margin: 20px;" id="">
               Click Here To Add an Image
             </button>`;
           } else {
+            //Set a placeholder, get the image, preload it, then replace the placeholder
             storageRef.child(
                 this.content
               ).getDownloadURL()
               .then((url) => {
-                $(`#${this.id}-note > .note-body`).append(`
-                    <image id="${this.id}-image" src="${url}" class="note-image">`)
-                  .zoom({
-                    magnify: 1.5
-                  }); //todo make blank image adding work
+                preloadImage(url).then((image) => {
+                  //#region animation for loading images in
+                  var dimensions = {
+                    x: image.width,
+                    y: image.height
+                  };
+                  var imageRatio = $(`#${this.id}-image`).width() / dimensions.x;
+                  //change the size of the placeholder to match the finished image
+                  $(`#${this.id}-loader-css`).html(`
+                    #${this.id}-image:after {
+                      content: "";
+                      display: block;
+                      padding-bottom: ${dimensions.y * imageRatio}px;
+                      transition: all 0.2s;
+                    }`);
+                  //replace the placeholder with the image.
+                  setTimeout(() => {
+                    $(`#${this.id}-image`).replaceWith(`
+                          <image id="${this.id}-image" src="${url}" class="note-image">`);
+                    $(`#${this.id}-image`).parent().zoom({
+                      magnify: 1.5
+                    }); //todo make new image adding work
+                  }, 200);
+                  //#endregion
+                });
               });
             //add placeholder
-            return '';
+            return `
+            <span id="${this.id}-image" class="loader">
+              <style id="${this.id}-loader-css"> 
+                #${this.id}-image:after {
+                  content: "";
+                  display: block;
+                  padding-bottom: 100%;
+                  transition: all 0.2s;
+                }
+              </style>
+            </span>`;
           } //todo when adding images, if you add an image with a different extension than the one it had before, it doesn't overwrite the image, but creates a new one. Not a huge issue, but could cause storage problems in the future.
       }
     }
@@ -96,10 +130,7 @@ $(function () {
       noteManager.notes[newNote.id] = newNote;
       $($('.note-column')[findSmallestColumn()])
         .append(newNote.html).children().last()
-        .fadeIn(100);
-      //finds the image within the newly created note
-
-
+        .fadeIn(50);
     }
   };
 
@@ -134,13 +165,17 @@ $(function () {
     return smallestColumn;
   }
 
-  function authStateChangedUi(userExists) {
+  function authStateChangedUi(userExists, populated = false) {
     switch (userExists) {
       case true:
-        $('#main-loader').fadeOut(100, function () {
+        if (!populated) {
+          $('#loading-text').html(`<h3>Populating notes...</h3>`);
+        } else {
 
-          $('.main-container').fadeIn();
-        });
+          $('#main-loader').fadeOut(100, function () {
+            $('.main-container').fadeIn(100);
+          });
+        }
         break;
       case false:
         $('.main-container').fadeOut(100, function () {
@@ -151,6 +186,62 @@ $(function () {
         break;
     }
   }
+
+  //todo make it so that you cannot confirm the image without a file in place that is valid.
+  function changeNoteImage(e) {
+    //creates popup to edit image
+    suopPopup.pop(popupConfirmHtml({
+      title: 'Change Image',
+      id: 'reimageNote',
+      body: `<input id="reimageNoteInput" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" accept="image/png, image/jpeg, image/gif, image/jpg, image/webp">`
+    }));
+    $('#reimageNoteInput').focus();
+
+    //awaits image selection
+    var image = new Promise(function (resolve, reject) {
+      $('#confirmreimageNote').click(function () {
+        resolve($('#reimageNoteInput').val());
+      });
+      $('#cancelreimageNote').click(() => reject());
+    });
+
+    //on confirmation of upload
+    image.then(function (fileName) {
+        //uploads
+        var file = $('#reimageNoteInput')[0].files[0];
+        var uploadIndicator = $.mSnackbar({
+          text: 'Uploading <i id="upload-percentage">0</i>%',
+          lifeSpan: Infinity
+        });
+        console.log($(e.target));
+        var domId = $(e.target).closest('.note-card')[0].id;
+        var noteId = domId.substr(0, domId.length - '-note'.length);
+        var imageUpload = storageRef.child(
+          `users/${user.uid}/images/${noteId}-note-image.${getFileExtension(fileName)}`
+        ).put(file);
+        imageUpload.on('state_changed', (snapshot) => {
+          var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          $('#upload-percentage').html(Math.trunc(progress));
+        });
+        imageUpload.then((snapshot) => {
+          console.log('Uploaded photo!');
+          setTimeout(() => uploadIndicator.close(), 1000);
+        });
+
+        //updates path to picture in database
+        database.ref(`users/${user.uid}/players/${fakeUrl}/notes/${noteId}/content`)
+          .set(`users/${user.uid}/images/${noteId}-note-image.${getFileExtension(fileName)}`);
+
+        //changes html to match
+        $(e.target).parent().children('img').attr('src', URL.createObjectURL(file));
+      },
+      function () {
+        console.log('failed');
+      }).finally(function () {
+      suopPopup.close();
+    });
+  } //todo when you right click an image, it loses its ability to be changed.
+
   //#region pull notes from storage and initialize custom right click
   //pseudo load notes function.
 
@@ -160,6 +251,7 @@ $(function () {
       var notePageRef = database.ref('users/' + user.uid + '/players/' + fakeUrl);
       notePageRef.on('value', (snapshot) => {
         var notes = snapshot.val().notes;
+        authStateChangedUi(true, true);
 
         //creates a list of client side notes
         var currentNoteKeys = function () {
@@ -178,12 +270,14 @@ $(function () {
           currentNoteKeys = currentNoteKeys.filter(key => key !== noteKey);
           //if the note exists, add it. Otherwise, edit the existing note.
           if ($('#' + noteId).length === 0) {
-            noteManager.addNote({
-              content: note.content,
-              title: note.title,
-              id: noteKey,
-              type: note.type
-            });
+            setTimeout(() => {
+              noteManager.addNote({
+                content: note.content,
+                title: note.title,
+                id: noteKey,
+                type: note.type
+              });
+            }, 200);
           } else {
             switch (note.type) {
               case noteTypes.text:
@@ -285,59 +379,15 @@ $(function () {
       var inputedTextBox = e.currentTarget;
       inputedTextBox.style.height = 'auto';
       inputedTextBox.style.height = (inputedTextBox.scrollHeight + 1) + 'px';
+      //todo limit number of consecutive writes.
+      //todo add syncing indicator to make sure people know when their work has saved.
+      database.ref(`users/${user.uid}/players/${fakeUrl}/notes/${$(inputedTextBox).attr('data-key')}/content`).set($(inputedTextBox).val());
     })
     //makes right click on notes open a custom menu
     .on('contextmenu', '.note-card', suopRightClick.rightClick)
     //todo makes clicking on images allow you to edit the image.
-    .on('click', '.zoomImg', (e) => {
-      console.log('image-clicked');
-      suopPopup.pop(popupConfirmHtml({
-        title: 'Change Image',
-        id: 'reimageNote',
-        body: `<input id="reimageNoteInput" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" accept="image/png, image/jpeg, image/gif, image/jpg, image/webp">`
-      }));
-      $('#reimageNoteInput').focus();
-      var image = new Promise(function (resolve, reject) {
-        $('#confirmreimageNote').click(function () {
-          resolve($('#reimageNoteInput').val());
-        });
-        $('#cancelreimageNote').click(() => reject());
-      });
-
-      image.then(function (fileName) {
-          var file = $('#reimageNoteInput')[0].files[0];
-
-          var uploadIndicator = $.mSnackbar({
-            text: 'Uploading <i id="upload-percentage">0</i>%',
-            lifeSpan: Infinity
-          });
-          var domId = $(e.currentTarget).closest('.note-card')[0].id;
-          var noteId = domId.substr(0, domId.length - '-note'.length);
-          var imageUpload = storageRef.child(
-            `users/${user.uid}/images/${noteId}-note-image.${getFileExtension(fileName)}`
-          ).put(file);
-          imageUpload.on('state_changed', (snapshot) => {
-            console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            $('#upload-percentage').html(Math.trunc(progress));
-          });
-          imageUpload.then((snapshot) => {
-            console.log('Uploaded photo!');
-            setTimeout(() => uploadIndicator.close(), 1000)
-          });
-
-          //updates path to picture in database
-          database.ref(`users/${user.uid}/players/${fakeUrl}/notes/${noteId}/content`)
-            .set(`users/${user.uid}/images/${noteId}-note-image.${getFileExtension(fileName)}`);
-
-          //changes html to match
-        },
-        function () {
-          console.log('failed');
-        }).finally(function () {
-        suopPopup.close();
-      });
-    });
+    .on('click', '.zoomImg', (e) => changeNoteImage(e))
+    .on('click', '.add-note-image-placeholder', (e) => changeNoteImage(e));
 
   $('#add-text-note').click(() =>
     database.ref(`users/${user.uid}/players/${fakeUrl}/notes`).push({

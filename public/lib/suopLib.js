@@ -2,6 +2,9 @@ const suopRightClick = {
   currentTarget: document,
   //relies on ripple & material icons library
   initialize: function () {
+    $(document).on('click', function (e) {
+      suopRightClick.close();
+    });
     $('body').append(`
       <style> 
         #suop-right-click-menu {
@@ -55,15 +58,11 @@ const suopRightClick = {
     $('#suop-right-click-menu').on('click', function (e) {
       e.stopPropagation();
     });
-    $(document).on('click', function (e) {
-      suopRightClick.close();
-    });
   },
 
   close: function () {
     $('#suop-right-click-menu').addClass('transform-collapsed');
     $('#suop-right-click-menu').off('click');
-    $(document).off('click');
   },
 
   addMenuItem: function ({
@@ -150,7 +149,7 @@ function getFileExtension(value) {
   return value.slice((Math.max(0, value.lastIndexOf(".")) || Infinity) + 1);
 }
 
-var preloadImage = function (src, callback) {
+var preloadImage = function (src) {
   var image = new Promise(function (resolve, reject) {
     var imageLoader = new Image();
     imageLoader.onload = function () {
