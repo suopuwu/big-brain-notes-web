@@ -1,15 +1,25 @@
-const fakeUrl = '-MWM43Pmy8tD8pH_Pv2A'; //todo remove
-
+// const windowUrl = 'players/-MWM43Pmy8tD8pH_Pv2A';//for debug purposes
+// removes the first / of the url path
+const windowUrl = window.location.pathname.substring(1);
 //returns an ever increasing value, there can be no duplicates because each time it is called, it increases.
 var iterator = function () {
   let value = 0;
   return function () {
     return value++;
-  }
+  };
 }();
-
+//todo fix search css
 
 $(function () {
+  $.mSnackbar({
+    text: 'test',
+    lifeSpan: Infinity
+  });
+  $.mSnackbar({
+    text: 'test',
+    lifeSpan: Infinity
+  });
+
   const noteTypes = {
     text: 0,
     image: 1
@@ -22,7 +32,7 @@ $(function () {
       id
     } = {}) {
       this._content = content;
-      this._type = type;
+      this.type = type;
       this.id = id;
       this.title = title;
     }
@@ -38,7 +48,7 @@ $(function () {
         </span>`;
     }
     get bodyHtml() {
-      switch (this._type) {
+      switch (this.type) {
         case noteTypes.text:
           return `<textarea class="text-note" role="textbox" placeholder="Write notes here..." data-key="${this.id}">${this._content}</textarea>`;
         case noteTypes.image:
@@ -74,7 +84,7 @@ $(function () {
                           <image id="${this.id}-image" src="${url}" class="note-image">`);
                     $(`#${this.id}-image`).parent().zoom({
                       magnify: 1.5
-                    }); //todo make new image adding work
+                    });
                   }, 200);
                   //#endregion
                 });
@@ -91,13 +101,8 @@ $(function () {
                 }
               </style>
             </span>`;
-          } //todo when adding images, if you add an image with a different extension than the one it had before, it doesn't overwrite the image, but creates a new one. Not a huge issue, but could cause storage problems in the future.
+          }
       }
-    }
-
-    delete() {
-      $('#' + this.id).remove();
-      delete noteManager.notes[this.id];
     }
 
     set content(val) {
@@ -168,13 +173,14 @@ $(function () {
   function authStateChangedUi(userExists, populated = false) {
     switch (userExists) {
       case true:
-        if (!populated) {
-          $('#loading-text').html(`<h3>Populating notes...</h3>`);
-        } else {
 
+        if (populated) { //if both the user and their notes have loaded
           $('#main-loader').fadeOut(100, function () {
             $('.main-container').fadeIn(100);
           });
+        } else { //if the user has loaded, but their notes have not
+          $('#loading-text').html(`<h3>Populating notes...</h3>`);
+
         }
         break;
       case false:
@@ -207,15 +213,23 @@ $(function () {
 
     //on confirmation of upload
     image.then(function (fileName) {
-        //uploads
+        //gets prerequisite information
         var file = $('#reimageNoteInput')[0].files[0];
+        var domId = $(e.target).closest('.note-card')[0].id;
+        var noteId = domId.substr(0, domId.length - '-note'.length);
+        //deletes the old image. Needs to do this because rewriting the old one risks creating duplicates if they have different file extensions.
+        if (noteManager.notes[noteId].content !== '') {
+          storageRef.child(noteManager.notes[noteId].content).delete()
+            .then(function () {
+              console.log('image deleted');
+            });
+        }
+
+        //uploads
         var uploadIndicator = $.mSnackbar({
           text: 'Uploading <i id="upload-percentage">0</i>%',
           lifeSpan: Infinity
         });
-        console.log($(e.target));
-        var domId = $(e.target).closest('.note-card')[0].id;
-        var noteId = domId.substr(0, domId.length - '-note'.length);
         var imageUpload = storageRef.child(
           `users/${user.uid}/images/${noteId}-note-image.${getFileExtension(fileName)}`
         ).put(file);
@@ -227,32 +241,59 @@ $(function () {
           console.log('Uploaded photo!');
           setTimeout(() => uploadIndicator.close(), 1000);
         });
-
+        //todo possibly fix the fact that if they try to delete the note before it finishes uploading, it causees an error.
         //updates path to picture in database
-        database.ref(`users/${user.uid}/players/${fakeUrl}/notes/${noteId}/content`)
+        database.ref(`users/${user.uid}/${windowUrl}/notes/${noteId}/content`)
           .set(`users/${user.uid}/images/${noteId}-note-image.${getFileExtension(fileName)}`);
-
+        noteManager.notes[noteId].content = `users/${user.uid}/images/${noteId}-note-image.${getFileExtension(fileName)}`;
         //changes html to match
-        $(e.target).parent().children('img').attr('src', URL.createObjectURL(file));
+        $(e.target).parent() //selects all images, including the zoom image
+          .html(`<image id="${noteId}-image" src="${URL.createObjectURL(file)}" class="note-image">`)
+          .zoom({
+            magnify: 1.5
+          });
       },
       function () {
         console.log('failed');
       }).finally(function () {
       suopPopup.close();
     });
-  } //todo when you right click an image, it loses its ability to be changed.
+  }
 
-  //#region pull notes from storage and initialize custom right click
-  //pseudo load notes function.
+  function syncUiChange(synced) {
+    switch (synced) {
+      case true:
+        window.onbeforeunload = null;
+        $('#sync-indicator-icon').html('cloud_done').removeClass('loading-icon');
+        $('#sync-indicator >span').html('Text changes saved');
+        break;
+      case false:
+        window.onbeforeunload = function () {
+          return "Your work is not saved! Please wait for it to upload.";
+        };
+        $('#sync-indicator-icon').html('cloud_queue').addClass('loading-icon');
+        $('#sync-indicator >span').html('syncing...');
+        break;
+    }
+  }
 
-  firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-      authStateChangedUi(true);
-      var notePageRef = database.ref('users/' + user.uid + '/players/' + fakeUrl);
-      notePageRef.on('value', (snapshot) => {
+  function loadNotes(user) {
+    var notePageRef = database.ref(`users/${user.uid}/${windowUrl}`);
+    notePageRef.on('value', (snapshot) => {
+      if (snapshot.val() !== null) { //if the user exists
+        if (firstTime) {
+          $('title').html(titleCase(snapshot.val().name) + ' | Big Brain Notes');
+          $('#note-page-title').html(titleCase(snapshot.val().name));
+          console.log(snapshot.val().name);
+          $('#note-container').css('background-color', snapshot.val().color);
+          authStateChangedUi(true, true);
+          firstTime = false;
+        }
+
+        //changes theme based on stored data
+
         var notes = snapshot.val().notes;
-        authStateChangedUi(true, true);
-
+        //todo make middle click open note in new tab
         //creates a list of client side notes
         var currentNoteKeys = function () {
           var keyArray = [];
@@ -262,6 +303,7 @@ $(function () {
           return keyArray;
         }();
 
+        //adds notes to ui
         for (let noteKey in notes) {
           const note = notes[noteKey];
           const noteId = `${noteKey}-note`;
@@ -288,15 +330,45 @@ $(function () {
             }
             $(`#${noteId} > .note-title`).html(note.title);
           }
-        } //todo make nice animation for image loading in.
+        }
 
         //removes deleted notes from the clientside.
         for (let noteKey of currentNoteKeys) {
           $(`#${noteKey}-note`).remove();
         }
+      } else {
+        $('#loading-text').html(`<h3>The note page you are looking for does not exist</h3>`);
+        let charactersList = [];
+        for (let character of Object.keys(basicCharData)) {
+          charactersList.push(character.replace(/\040/gi, '-'));
+        }
+        console.log(charactersList);
+        const characterName = windowUrl.split('/')[1];
+        const characterNameWithSpaces = characterName.replace(/-/gi, ' ');
+        if (charactersList.includes(characterName)) {
+          database.ref(`users/${user.uid}/${windowUrl}`).set({
+            name: characterNameWithSpaces,
+            color: '#' + basicCharData[characterNameWithSpaces].theme.toString(16).substr(2),
+            notes: {
+              defaultNote: {
+                type: noteTypes.text,
+                title: 'Matchup Notes',
+                content: ''
+              }
+            }
+          });
+        }
+      }
+    });
+  }
 
-      });
-
+  //#region pull notes from storage and initialize custom right click
+  //pseudo load notes function.
+  var firstTime = true;
+  firebase.auth().onAuthStateChanged(function (user) {
+    if (user) {
+      authStateChangedUi(true);
+      loadNotes(user);
 
     } else {
       authStateChangedUi(false);
@@ -340,7 +412,7 @@ $(function () {
 
       text.then(function (newText) {
         const noteId = suopRightClick.currentTarget.id.substr(0, suopRightClick.currentTarget.id.length - '-note'.length);
-        database.ref(`users/${user.uid}/players/${fakeUrl}/notes/${noteId}/title`).set(newText);
+        database.ref(`users/${user.uid}/${windowUrl}/notes/${noteId}/title`).set(newText);
       }, function () {
         console.log('failed');
       }).finally(function () {
@@ -363,7 +435,16 @@ $(function () {
       $('#confirmdeleteNote').click(function () {
         const noteId = suopRightClick.currentTarget.id.substr(0, suopRightClick.currentTarget.id.length - '-note'.length);
 
-        database.ref(`users/${user.uid}/players/${fakeUrl}/notes/${noteId}`).remove();
+        database.ref(`users/${user.uid}/${windowUrl}/notes/${noteId}`).remove();
+        if (noteManager.notes[noteId].type === noteTypes.image &&
+          noteManager.notes[noteId].content !== '') { //makes sure there is a file to delete
+          console.log(noteManager.notes[noteId]);
+          storageRef.child(noteManager.notes[noteId].content).delete()
+            .then(function () {
+              console.log('image deleted');
+            });
+        }
+        delete noteManager.notes[noteId];
         suopPopup.close();
       });
 
@@ -371,31 +452,95 @@ $(function () {
     }
   });
   //#endregion
+  //todo make this not specific to player notes.
+  //executes a function after the specified number of ms, but if it is called again before the timer is up, it resets the timer.
+  //if run without arguments, it gives a list of ongoing timers.
+  var deferNoDuplicates = function () {
+    var timeouts = {};
+    return function ({
+      callback,
+      timerLength,
+      id
+    } = {}) {
+      if (callback) {
+
+        if (!id) {
+          id = 'default';
+        }
+        if (timeouts[id]) {
+          clearTimeout(timeouts[id]);
+        }
+        timeouts[id] = setTimeout(() => {
+          callback();
+          timeouts[id] = null;
+        }, timerLength);
+      } else {
+        return timeouts;
+      }
+
+    };
+  }();
+
+  function updateTextInDatabase(inputtedTextBox) {
+    console.log($(inputtedTextBox).attr('data-key') + ' saved');
+    database.ref(`users/${user.uid}/${windowUrl}/notes/${$(inputtedTextBox).attr('data-key')}/content`).set($(inputtedTextBox).val());
+  }
+
+  function saveAllTextNotes(e) {
+    for (let noteKey in noteManager.notes) {
+      if (noteManager.notes[noteKey].type === noteTypes.text) {
+        updateTextInDatabase($(`#${noteKey}-note > .note-body > textarea`)[0]);
+      }
+    }
+    e.preventDefault();
+    syncUiChange(true);
+  }
 
   //event handlers for dynamically added elements.
   $(document)
-    //expands textboxes as they type
+    //expands textboxes as they type and saves inputted text to the cloud
     .on('input', '.text-note', (e) => {
-      var inputedTextBox = e.currentTarget;
-      inputedTextBox.style.height = 'auto';
-      inputedTextBox.style.height = (inputedTextBox.scrollHeight + 1) + 'px';
-      //todo limit number of consecutive writes.
-      //todo add syncing indicator to make sure people know when their work has saved.
-      database.ref(`users/${user.uid}/players/${fakeUrl}/notes/${$(inputedTextBox).attr('data-key')}/content`).set($(inputedTextBox).val());
+      e.preventDefault();
+      console.log();
+
+      const inputtedTextBox = e.currentTarget;
+      const noteId = $(e.target).attr('data-key');
+      inputtedTextBox.style.height = 'auto';
+      inputtedTextBox.style.height = (inputtedTextBox.scrollHeight + 1) + 'px';
+      syncUiChange(false);
+
+      //prevents it from sending more than one write per three seconds
+      deferNoDuplicates({
+        callback: () => updateTextInDatabase(inputtedTextBox),
+        timerLength: 3000,
+        id: noteId
+      });
+      deferNoDuplicates({
+        callback: () => syncUiChange(true),
+        timerLength: 3500, //an extra 3500 to be sure it has uploaded
+        id: 'all notes saved'
+      });
+    })
+    .on('keydown', '.text-note', (e) => {
+      if (e.ctrlKey && (e.which == 83)) {
+        saveAllTextNotes(e);
+      }
+    })
+    .bind('keydown', 'ctrl+s', (e) => {
+      saveAllTextNotes(e);
     })
     //makes right click on notes open a custom menu
     .on('contextmenu', '.note-card', suopRightClick.rightClick)
-    //todo makes clicking on images allow you to edit the image.
     .on('click', '.zoomImg', (e) => changeNoteImage(e))
     .on('click', '.add-note-image-placeholder', (e) => changeNoteImage(e));
 
   $('#add-text-note').click(() =>
-    database.ref(`users/${user.uid}/players/${fakeUrl}/notes`).push({
+    database.ref(`users/${user.uid}/${windowUrl}/notes`).push({
       title: 'New Note',
       content: '',
       type: noteTypes.text
     }));
-  $('#add-image-note').click(() => database.ref(`users/${user.uid}/players/${fakeUrl}/notes`).push({
+  $('#add-image-note').click(() => database.ref(`users/${user.uid}/${windowUrl}/notes`).push({
     title: 'New Image',
     content: '',
     type: noteTypes.image
@@ -403,11 +548,9 @@ $(function () {
 
 });
 
-//todo add a slider to change the magnification on zoom.
 //$('#example').trigger('zoom.destroy'); to remove zoom.
 //todo possibly add a license to avoid legal trouble.
 //todo ensure graceful handling of multiple sessions on the same account.
 //todo make rename popup auto populate and select text.
-//todo make it so that new notes are auto added to the event listener instead of creating a new event listener for each one.
 //todo make sure that deleting a note deletes the corresponding image.
 //todo add graceful error handling for upload

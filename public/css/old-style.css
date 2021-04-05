@@ -79,6 +79,23 @@ h1 {
   flex-grow: 1;
 }
 
+.nav-menu-row {
+  align-items: center;
+}
+
+.flex {
+  display: flex;
+}
+
+span.nav-ui {
+  font-size: 1.2em;
+}
+
+.inline-icon {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 #sign-in-button {
   display: flex;
   border-radius: 10px;
@@ -396,6 +413,8 @@ input:focus {
   font-size: 2em;
 }
 
+
+
 /*character styles*/
 .main-container {
   flex-grow: 1;
@@ -405,6 +424,7 @@ input:focus {
   background-color: #add;
   padding: 0.7vmax;
   grid-column-start: 2;
+  transition: background-color 0.2s;
 }
 
 .note-column {

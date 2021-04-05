@@ -160,3 +160,14 @@ var preloadImage = function (src) {
   });
   return image;
 };
+
+function titleCase(str) {
+  let strLowerCase = str.toLowerCase();
+  let wordArr = strLowerCase.split(" ").map(function (currentValue) {
+    if (currentValue[0]) {
+      return currentValue[0].toUpperCase() + currentValue.substring(1);
+    }
+  });
+
+  return wordArr.join(" ");
+}

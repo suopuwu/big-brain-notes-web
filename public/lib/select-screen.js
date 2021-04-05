@@ -17,6 +17,7 @@ $.cssHooks.backgroundColor = {
     }
   },
 };
+//todo ui is janky when you add a player. It has an infinite loading icon.
 //#endregion
 $(function () {
   //#region initialization variables
@@ -48,6 +49,7 @@ $(function () {
       //on value change
       playersRef.on('value', (snapshot) => {
         const players = snapshot.val();
+        console.log(players);
         for (let key in players) {
           var player = players[key];
           var tileHtml = getTileHtml({
@@ -75,7 +77,7 @@ $(function () {
       authStateChangedUi(false);
     }
   });
-
+  //todo make people able to choose character images for their player images.
   //this isn't universal, requires html to be setup in a specific way.
   function authStateChangedUi(userExists) {
     switch (userExists) {
@@ -87,7 +89,7 @@ $(function () {
         break;
       case false:
         $('#main-select-screen').fadeOut(100, function () {
-          $('#main-lmain-select-screenoader').fadeIn();
+          $('#main-loader').fadeIn();
           $('#loading-text').html(`
                 PLEASE<h3>LOGIN</h3>`);
         });
@@ -95,7 +97,7 @@ $(function () {
     }
   }
 
-  //todo it does not do anything when a character is deleted on the server. May have to fix this.
+  //todo when a character is deleted outside of the client, say from another computer, the pss doesn't update. fix this.
   function internalModeSwitch() {
     clearSearch();
     switch ($(this).val()) {

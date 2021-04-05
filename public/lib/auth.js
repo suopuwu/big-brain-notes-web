@@ -1,4 +1,15 @@
 $(function () {
+  const bbnVersion = '0.0.0';
+  database.ref("version").on('value', (version) => {
+    console.log(version.val());
+    if (version.val() !== bbnVersion) {
+      var updatePrompter = $.mSnackbar({
+        text: `You are on version ${bbnVersion}, the latest is ${version.val()}. Please refresh the page to update. Major features may not work otherwise.`,
+        lifeSpan: Infinity
+      });
+    }
+  });
+
   var signInHtml = `
     <style>
       #sign-in {
@@ -57,7 +68,7 @@ $(function () {
       <button class="ripple" id="sign-in-confirm">Login</button>
       <button class="ripple display-none" id="register-confirm">Register</button>
       <span class="login-icon-holder">
-        <image src="images/google.png" class="login-icon" id="google-login">
+        <image src="/images/google.png" class="login-icon" id="google-login">
       </span>
     </div>
   `;
@@ -70,6 +81,12 @@ $(function () {
 
   firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
+      if (!user.emailVerified) {
+        $.mSnackbar({
+          text: 'You have not verified your email. Please do so, as without a verified email, the app will not work.',
+
+        });
+      }
       //if already logged in
       // console.log(user);
       // console.log("current user above");
@@ -252,4 +269,3 @@ $(function () {
 });
 
 //todo make it so that you can use urls of images for player images.
-//todo add loading animation for before the user is recognized
