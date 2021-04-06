@@ -11,15 +11,6 @@ var iterator = function () {
 //todo fix search css
 
 $(function () {
-  $.mSnackbar({
-    text: 'test',
-    lifeSpan: Infinity
-  });
-  $.mSnackbar({
-    text: 'test',
-    lifeSpan: Infinity
-  });
-
   const noteTypes = {
     text: 0,
     image: 1

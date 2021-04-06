@@ -1,0 +1,44 @@
+$spacing: 20px
+#mSnackbarContainer
+  display: flex
+  flex-flow: column nowrap
+  align-items: flex-end
+  z-index: 1000
+  position: fixed
+  right: $spacing
+  overflow: hidden
+  pointer-events: none
+  bottom: 0
+  transition: transform 0.5s
+  .snackbar-wrapper
+    overflow: hidden
+  .mSnackbar
+    pointer-events: all
+    line-height: 22px
+    padding: 14px 24px
+    background-color: #323232
+    color: #fff
+    font-size: 14px
+    z-index: 100
+    min-width: 288px
+    max-width: 568px
+    border-radius: 2px
+    margin-bottom: $spacing
+    animation-duration: .2s
+    animation-fill-mode: both
+    user-select: none
+    transition: all 0.2s ease-in-out
+    @media (orientation: portrait)
+      max-width: 100%
+      margin: 0
+  @media (orientation: portrait)
+    right: 0
+
+    // &.slideIn
+    //   animation-name: slideIn
+
+    // &.slideOut
+    //   animation-name: slideOut
+// to do this, make it so that the snackbars are static, but the main container moves up.
+.no-transition
+  transition: none !important

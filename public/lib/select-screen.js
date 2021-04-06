@@ -20,6 +20,10 @@ $.cssHooks.backgroundColor = {
 //todo ui is janky when you add a player. It has an infinite loading icon.
 //#endregion
 $(function () {
+  $.mSnackbar({
+    text: 'test I don\'t really know what to put in this snackbar, so instead I\'m just going to write some placeholder text.',
+    lifeSpan: 2000
+  });
   //#region initialization variables
   var charTiles = $('#css > .tile-button');
   var playerTiles = $('#pss > .tile-button');
@@ -41,6 +45,33 @@ $(function () {
     .on('contextmenu', '.tile-button', rightClickMenu);
   $('#search-label-icon').click(clearSearch);
   $('#add-char-fab').click(addPlayer);
+
+  //custom middle click event listener
+  $(document).on("mousedown", '.tile-button', function (e1) {
+    $(document).one("mouseup", function (e2) {
+      if (e1.which == 2 && e1.target == e2.target) {
+        var clickedTile = $(e2.target).closest('.tile-button');
+        var tileHolder = $(e2.target).closest('.tile-holder');
+        var initPath;
+        switch (tileHolder.attr('id')) {
+          case 'css':
+            initPath = '/characters/';
+            break;
+          case 'pss':
+            initPath = '/players/';
+            break;
+        }
+        console.log(tileHolder);
+        var tileId = clickedTile.attr('id');
+        console.log($(e2.target).closest('.tile-button').attr('id'));
+        window.open(initPath +
+          tileId
+          .slice(0, tileId.length - '-tile'.length), "_blank");
+      }
+    });
+    return false;
+  });
+
   //#endregion
   firebase.auth().onAuthStateChanged(function (user) { //adds player buttons
     if (user) {
@@ -124,6 +155,16 @@ $(function () {
       $(this)
       .attr('id')
       .slice(0, $(this).attr('id').length - 5);
+  }
+
+  function newCharacterTab(e, initPath) {
+    console.log($(e.delegateTarget).attr('id'));
+    var tileId = $(e.delegateTarget).attr('id');
+    e.preventDefault();
+    window.open(initPath +
+      tileId
+      .slice(0, tileId.length - '-tile'.length), "_blank");
+    return false;
   }
 
   function pruneSearchTerms(e) {

@@ -1,0 +1,52 @@
+#mSnackbarContainer {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-end;
+  z-index: 1000;
+  position: fixed;
+  right: 20px;
+  overflow: hidden;
+  pointer-events: none;
+  bottom: 0;
+  transition: transform 0.5s;
+}
+#mSnackbarContainer .snackbar-wrapper {
+  overflow: hidden;
+}
+#mSnackbarContainer .mSnackbar {
+  pointer-events: all;
+  line-height: 22px;
+  padding: 14px 24px;
+  background-color: #323232;
+  color: #fff;
+  font-size: 14px;
+  z-index: 100;
+  min-width: 288px;
+  max-width: 568px;
+  border-radius: 2px;
+  margin-bottom: 20px;
+  -webkit-animation-duration: 0.2s;
+          animation-duration: 0.2s;
+  -webkit-animation-fill-mode: both;
+          animation-fill-mode: both;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  transition: all 0.2s ease-in-out;
+}
+@media (orientation: portrait) {
+  #mSnackbarContainer .mSnackbar {
+    max-width: 100%;
+    margin: 0;
+  }
+}
+@media (orientation: portrait) {
+  #mSnackbarContainer {
+    right: 0;
+  }
+}
+
+.no-transition {
+  transition: none !important;
+}/*# sourceMappingURL=mSnackBar.css.map */
