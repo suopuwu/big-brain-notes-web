@@ -5,7 +5,7 @@ const suopRightClick = {
     $(document).on('click', function (e) {
       suopRightClick.close();
     });
-    $('body').append(`
+    $('body').append(html `
       <style> 
         #suop-right-click-menu {
           display: flex;
@@ -21,6 +21,12 @@ const suopRightClick = {
         }
 
         #suop-right-click-menu > a {
+          user-drag: none; 
+          user-select: none;
+          -moz-user-select: none;
+          -webkit-user-drag: none;
+          -webkit-user-select: none;
+          -ms-user-select: none;
           display: flex;
           flex-flow: row nowrap;
           align-items: center;
@@ -90,7 +96,7 @@ const suopPopup = {
   pop: function (content, callback = function () {}) {
     if ($('#suop-popup').length === 0) {
       $('body').append(`
-      <div style="position:fixed;height:100vh;width:100vw;background-color:rgba(0,0,0,0.5);z-index:1000;transition: all 0.2s;display:flex;justify-content: center;align-items: center;opacity:0;" id="suop-popup">
+      <div style="position:fixed;height:100vh;width:100vw;background-color:rgba(0,0,0,0.5);z-index:500;transition: all 0.2s;display:flex;justify-content: center;align-items: center;opacity:0;" id="suop-popup">
         <span id="inner-suop-popup" style ="box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);background-color:white;padding: 20px;border-radius:10px;"></span>
       </div>
     `);
@@ -170,4 +176,11 @@ function titleCase(str) {
   });
 
   return wordArr.join(" ");
+}
+
+//a template literal tag that does nothing. Just for readability.
+function html(t) {
+  for (var o = [t[0]], i = 1, l = arguments.length; i < l; i++)
+    o.push(arguments[i], t[i]);
+  return o.join('');
 }

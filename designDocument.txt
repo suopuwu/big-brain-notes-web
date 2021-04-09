@@ -1,15 +1,6 @@
-Rust server with rocket framework
-
-Build template pages with client side stuff, convert into liquid templates. Use server to save data.
-server serves pages like website.com/mario
-website.com/playername-uniqueid/set-count
-
-
-
-Possible electron app?
-
-
-within the note page, the theme and other universal elements are rendered by the server. Then, the client asks for their notes and those are loaded in.
-
-
 firebase emulators:start
+
+goals:
+resize images in the app to fit.
+Possible electron app?
+make people able to choose character images for their player images.

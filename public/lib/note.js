@@ -1,6 +1,6 @@
-// const windowUrl = 'players/-MWM43Pmy8tD8pH_Pv2A';//for debug purposes
+const windowUrl = 'players/-MWM43Pmy8tD8pH_Pv2A'; //for debug purposes
 // removes the first / of the url path
-const windowUrl = window.location.pathname.substring(1);
+// const windowUrl = window.location.pathname.substring(1);
 //returns an ever increasing value, there can be no duplicates because each time it is called, it increases.
 var iterator = function () {
   let value = 0;
@@ -8,7 +8,6 @@ var iterator = function () {
     return value++;
   };
 }();
-//todo fix search css
 
 $(function () {
   const noteTypes = {
@@ -184,20 +183,48 @@ $(function () {
     }
   }
 
-  //todo make it so that you cannot confirm the image without a file in place that is valid.
+
   function changeNoteImage(e) {
     //creates popup to edit image
     suopPopup.pop(popupConfirmHtml({
       title: 'Change Image',
       id: 'reimageNote',
-      body: `<input id="reimageNoteInput" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" accept="image/png, image/jpeg, image/gif, image/jpg, image/webp">`
+      body: html `
+      <div>Choose Your Image (1MB limit)</div>
+      <label class="file-upload ripple">
+        <input id="reimageNoteInput" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" accept="image/png, image/jpeg, image/gif, image/jpg, image/webp">
+        <span>
+          Upload
+        </span>
+        <img id="image-upload-preview" width="200px">
+      </label>
+      `
     }));
     $('#reimageNoteInput').focus();
 
+
+    $('#reimageNoteInput').on('change', () => {
+      var file = $('#reimageNoteInput')[0].files[0];
+      $('#image-upload-preview').attr('src', URL.createObjectURL(file));
+    });
     //awaits image selection
     var image = new Promise(function (resolve, reject) {
       $('#confirmreimageNote').click(function () {
-        resolve($('#reimageNoteInput').val());
+        var file = $('#reimageNoteInput')[0].files[0];
+        //makes sure the image being uploaded exists and is smaller than 1MB
+        if (file) {
+          if (file.size < 1024 * 1024) {
+            resolve($('#reimageNoteInput').val());
+          } else {
+            $.mSnackbar.add({
+              text: `<i style="color: #ef5350">Error: </i>File is too large (${Math.trunc(file.size / (1024 *1024))}MB/1MB)`
+            });
+          }
+        } else {
+          $.mSnackbar.add({
+            text: '<i style="color: #ef5350">Error: </i>Please choose a file to upload'
+          });
+        }
       });
       $('#cancelreimageNote').click(() => reject());
     });
@@ -217,22 +244,23 @@ $(function () {
         }
 
         //uploads
-        var uploadIndicator = $.mSnackbar({
-          text: 'Uploading <i id="upload-percentage">0</i>%',
-          lifeSpan: Infinity
+        var uploadIndicator = $.mSnackbar.add({
+          text: `Uploading <i id="upload-percentage${noteId}">0</i>%`,
+          lifeSpan: Infinity,
+          noCloseButton: true
         });
         var imageUpload = storageRef.child(
           `users/${user.uid}/images/${noteId}-note-image.${getFileExtension(fileName)}`
         ).put(file);
         imageUpload.on('state_changed', (snapshot) => {
           var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          $('#upload-percentage').html(Math.trunc(progress));
+          $('#upload-percentage' + noteId).html(Math.trunc(progress));
         });
         imageUpload.then((snapshot) => {
           console.log('Uploaded photo!');
-          setTimeout(() => uploadIndicator.close(), 1000);
+          $(`#${uploadIndicator.id}`).find('.mSnackbar-content').html('Upload complete!');
+          setTimeout(() => uploadIndicator.close(), 3000);
         });
-        //todo possibly fix the fact that if they try to delete the note before it finishes uploading, it causees an error.
         //updates path to picture in database
         database.ref(`users/${user.uid}/${windowUrl}/notes/${noteId}/content`)
           .set(`users/${user.uid}/images/${noteId}-note-image.${getFileExtension(fileName)}`);
@@ -243,12 +271,12 @@ $(function () {
           .zoom({
             magnify: 1.5
           });
+        suopPopup.close();
       },
       function () {
         console.log('failed');
-      }).finally(function () {
-      suopPopup.close();
-    });
+        suopPopup.close();
+      });
   }
 
   function syncUiChange(synced) {
@@ -275,7 +303,6 @@ $(function () {
         if (firstTime) {
           $('title').html(titleCase(snapshot.val().name) + ' | Big Brain Notes');
           $('#note-page-title').html(titleCase(snapshot.val().name));
-          console.log(snapshot.val().name);
           $('#note-container').css('background-color', snapshot.val().color);
           authStateChangedUi(true, true);
           firstTime = false;
@@ -284,7 +311,6 @@ $(function () {
         //changes theme based on stored data
 
         var notes = snapshot.val().notes;
-        //todo make middle click open note in new tab
         //creates a list of client side notes
         var currentNoteKeys = function () {
           var keyArray = [];
@@ -425,17 +451,24 @@ $(function () {
 
       $('#confirmdeleteNote').click(function () {
         const noteId = suopRightClick.currentTarget.id.substr(0, suopRightClick.currentTarget.id.length - '-note'.length);
+        if ($('#upload-percentage' + noteId).length === 0) {
 
-        database.ref(`users/${user.uid}/${windowUrl}/notes/${noteId}`).remove();
-        if (noteManager.notes[noteId].type === noteTypes.image &&
-          noteManager.notes[noteId].content !== '') { //makes sure there is a file to delete
-          console.log(noteManager.notes[noteId]);
-          storageRef.child(noteManager.notes[noteId].content).delete()
-            .then(function () {
-              console.log('image deleted');
-            });
+          database.ref(`users/${user.uid}/${windowUrl}/notes/${noteId}`).remove();
+          if (noteManager.notes[noteId].type === noteTypes.image &&
+            noteManager.notes[noteId].content !== '') { //makes sure there is a file to delete
+            console.log(noteManager.notes[noteId]);
+            storageRef.child(noteManager.notes[noteId].content).delete()
+              .then(function () {
+                console.log('image deleted');
+              });
+          }
+          delete noteManager.notes[noteId];
+        } else {
+          $.mSnackbar.add({
+            text: '<i style="color: #ef5350">Error: </i>Please wait for the image to finish uploading before deleting the player. If this is a bug, try refreshing the page.'
+          });
         }
-        delete noteManager.notes[noteId];
+
         suopPopup.close();
       });
 
@@ -443,7 +476,6 @@ $(function () {
     }
   });
   //#endregion
-  //todo make this not specific to player notes.
   //executes a function after the specified number of ms, but if it is called again before the timer is up, it resets the timer.
   //if run without arguments, it gives a list of ongoing timers.
   var deferNoDuplicates = function () {
@@ -543,5 +575,3 @@ $(function () {
 //todo possibly add a license to avoid legal trouble.
 //todo ensure graceful handling of multiple sessions on the same account.
 //todo make rename popup auto populate and select text.
-//todo make sure that deleting a note deletes the corresponding image.
-//todo add graceful error handling for upload

@@ -783,3 +783,8 @@ var basicCharData = {
         "theme": 0xff69e6c3
     },
 };
+
+function pickRandomCharacter() {
+    var keys = Object.keys(basicCharData);
+    return keys[Math.floor(Math.random() * keys.length)];
+}
