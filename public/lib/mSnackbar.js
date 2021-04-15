@@ -64,7 +64,7 @@ $(function () {
         }
         return actionsHtml.join('');
       }
-
+      //todo add option for bottom offset to make the snackbar not cover important ui.
       //adds the new snackbar to the dom.
       snackbarContainer.append(`
       <span id="${this.id}" class="snackbar-wrapper">

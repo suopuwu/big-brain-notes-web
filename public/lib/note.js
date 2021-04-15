@@ -299,7 +299,7 @@ $(function () {
   function loadNotes(user) {
     var notePageRef = database.ref(`users/${user.uid}/${windowUrl}`);
     notePageRef.on('value', (snapshot) => {
-      if (snapshot.val() !== null) { //if the user exists
+      if (snapshot.val() !== null) { //if the note exists
         if (firstTime) {
           $('title').html(titleCase(snapshot.val().name) + ' | Big Brain Notes');
           $('#note-page-title').html(titleCase(snapshot.val().name));
@@ -340,9 +340,17 @@ $(function () {
           } else {
             switch (note.type) {
               case noteTypes.text:
-                $(`#${noteId} > .note-body > .text-note`).html(note.content);
+                console.log('note was chnaged');
+                $(`#${noteId} > .note-body > .text-note`).val(note.content);
                 break;
               case noteTypes.image:
+                console.log(note);
+                console.log(noteManager.notes);
+                //if the note in the database is not the same as the one stored in the client.
+                //This only is true when a second client uploads an image and the first client observes the change.
+                if (note.content !== noteManager.notes[noteKey].content) {
+                  console.log('note changed');
+                }
                 break;
             }
             $(`#${noteId} > .note-title`).html(note.title);
@@ -354,7 +362,7 @@ $(function () {
           $(`#${noteKey}-note`).remove();
         }
       } else {
-        $('#loading-text').html(`<h3>The note page you are looking for does not exist</h3>`);
+        $('#loading-text').html(`<h3>The note page you are looking for does not exist, or it may have been deleted.</h3>`);
         let charactersList = [];
         for (let character of Object.keys(basicCharData)) {
           charactersList.push(character.replace(/\040/gi, '-'));
@@ -505,7 +513,7 @@ $(function () {
   }();
 
   function updateTextInDatabase(inputtedTextBox) {
-    console.log($(inputtedTextBox).attr('data-key') + ' saved');
+    // console.log($(inputtedTextBox).attr('data-key') + ' saved');
     database.ref(`users/${user.uid}/${windowUrl}/notes/${$(inputtedTextBox).attr('data-key')}/content`).set($(inputtedTextBox).val());
   }
 
@@ -524,7 +532,6 @@ $(function () {
     //expands textboxes as they type and saves inputted text to the cloud
     .on('input', '.text-note', (e) => {
       e.preventDefault();
-      console.log();
 
       const inputtedTextBox = e.currentTarget;
       const noteId = $(e.target).attr('data-key');

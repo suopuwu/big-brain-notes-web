@@ -28,7 +28,10 @@ body
   grid-template-columns: 19vmax auto
   overflow-x: hidden
   background-color: black
-//todo make layout responsive
+  @media (orientation: portrait)
+    display: flex
+    flex-flow: column
+
 a
   color: $text-color
   text-decoration: none
@@ -45,6 +48,10 @@ a
   height: calc(100% - 2vmax)
   z-index: 2
   position: fixed
+  @media (orientation: portrait)
+    position: static
+    height: auto
+    width: 100%
 
 h1
   font-size: 1.2em

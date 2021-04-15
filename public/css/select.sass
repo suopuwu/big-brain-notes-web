@@ -72,6 +72,8 @@
   background-color: antiquewhite
   cursor: pointer
   overflow: hidden
+  @media (orientation: portrait)
+    width: 50%
 
   &:hover
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)
@@ -112,6 +114,7 @@
 
     .foreground-number
       display: flex
+      z-index: 1
       flex-flow: row
 
 .inner-foreground-number

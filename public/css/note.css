@@ -31,6 +31,12 @@ body {
   overflow-x: hidden;
   background-color: black;
 }
+@media (orientation: portrait) {
+  body {
+    display: flex;
+    flex-flow: column;
+  }
+}
 
 a {
   color: #1b1b1b;
@@ -51,6 +57,13 @@ a > .material-icons {
   height: calc(100% - 2vmax);
   z-index: 2;
   position: fixed;
+}
+@media (orientation: portrait) {
+  .nav-menu {
+    position: static;
+    height: auto;
+    width: 100%;
+  }
 }
 
 h1 {
@@ -192,6 +205,12 @@ label.file-upload > input {
   padding: 0.7vmax;
   grid-column-start: 2;
   transition: background-color 0.2s;
+}
+@media (orientation: portrait) {
+  .main-container {
+    display: flex;
+    flex-flow: column nowrap;
+  }
 }
 
 .note-column {

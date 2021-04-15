@@ -81,6 +81,7 @@ $(function () {
       //on value change
       playersRef.on('value', (snapshot) => {
         const players = snapshot.val();
+        var playersFromOnline = Object.keys(players);
         for (let key in players) {
           var player = players[key];
           var tileHtml = getTileHtml({
@@ -127,7 +128,6 @@ $(function () {
     }
   }
 
-  //todo when a character is deleted outside of the client, say from another computer, the pss doesn't update. fix this.
   function internalModeSwitch() {
     clearSearch();
     switch ($(this).val()) {

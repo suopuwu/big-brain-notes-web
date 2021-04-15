@@ -31,6 +31,12 @@ body {
   overflow-x: hidden;
   background-color: black;
 }
+@media (orientation: portrait) {
+  body {
+    display: flex;
+    flex-flow: column;
+  }
+}
 
 a {
   color: #1b1b1b;
@@ -51,6 +57,13 @@ a > .material-icons {
   height: calc(100% - 2vmax);
   z-index: 2;
   position: fixed;
+}
+@media (orientation: portrait) {
+  .nav-menu {
+    position: static;
+    height: auto;
+    width: 100%;
+  }
 }
 
 h1 {
@@ -270,6 +283,11 @@ label.file-upload > input {
   cursor: pointer;
   overflow: hidden;
 }
+@media (orientation: portrait) {
+  .tile-button {
+    width: 50%;
+  }
+}
 .tile-button:hover {
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   transform: scale(1.05);
@@ -308,6 +326,7 @@ label.file-upload > input {
 }
 .tile-button > .foreground-number {
   display: flex;
+  z-index: 1;
   flex-flow: row;
 }
 
