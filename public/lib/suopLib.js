@@ -184,3 +184,31 @@ function html(t) {
     o.push(arguments[i], t[i]);
   return o.join('');
 }
+
+//executes a function after the specified number of ms, but if it is called again before the timer is up, it resets the timer.
+//if run without arguments, it gives a list of ongoing timers.
+var deferNoDuplicates = function () {
+  var timeouts = {};
+  return function ({
+    callback,
+    timerLength,
+    id
+  } = {}) {
+    if (callback) {
+
+      if (!id) {
+        id = 'default';
+      }
+      if (timeouts[id]) {
+        clearTimeout(timeouts[id]);
+      }
+      timeouts[id] = setTimeout(() => {
+        callback();
+        timeouts[id] = null;
+      }, timerLength);
+    } else {
+      return timeouts;
+    }
+
+  };
+}();

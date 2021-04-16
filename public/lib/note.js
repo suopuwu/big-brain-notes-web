@@ -9,6 +9,10 @@ var iterator = function () {
   };
 }();
 
+var notePageInfo = {
+  pendingWrites: {}
+};
+
 $(function () {
   const noteTypes = {
     text: 0,
@@ -340,12 +344,12 @@ $(function () {
           } else {
             switch (note.type) {
               case noteTypes.text:
-                console.log('note was chnaged');
                 $(`#${noteId} > .note-body > .text-note`).val(note.content);
                 break;
               case noteTypes.image:
                 console.log(note);
                 console.log(noteManager.notes);
+                //todo make it so image changes on the server and versioning is handled gracefully
                 //if the note in the database is not the same as the one stored in the client.
                 //This only is true when a second client uploads an image and the first client observes the change.
                 if (note.content !== noteManager.notes[noteKey].content) {
@@ -484,47 +488,30 @@ $(function () {
     }
   });
   //#endregion
-  //executes a function after the specified number of ms, but if it is called again before the timer is up, it resets the timer.
-  //if run without arguments, it gives a list of ongoing timers.
-  var deferNoDuplicates = function () {
-    var timeouts = {};
-    return function ({
-      callback,
-      timerLength,
-      id
-    } = {}) {
-      if (callback) {
 
-        if (!id) {
-          id = 'default';
-        }
-        if (timeouts[id]) {
-          clearTimeout(timeouts[id]);
-        }
-        timeouts[id] = setTimeout(() => {
-          callback();
-          timeouts[id] = null;
-        }, timerLength);
-      } else {
-        return timeouts;
+
+  function updateTextInDatabase(inputtedTextBox, callback) {
+    database.ref(`users/${user.uid}/${windowUrl}/notes/${$(inputtedTextBox).attr('data-key')}/content`).set($(inputtedTextBox).val()).then(() => {
+      if (typeof callback === 'function') {
+        delete notePageInfo.pendingWrites[$(inputtedTextBox).attr('data-key')];
+        callback();
       }
-
-    };
-  }();
-
-  function updateTextInDatabase(inputtedTextBox) {
-    // console.log($(inputtedTextBox).attr('data-key') + ' saved');
-    database.ref(`users/${user.uid}/${windowUrl}/notes/${$(inputtedTextBox).attr('data-key')}/content`).set($(inputtedTextBox).val());
+    });
   }
 
   function saveAllTextNotes(e) {
     for (let noteKey in noteManager.notes) {
       if (noteManager.notes[noteKey].type === noteTypes.text) {
-        updateTextInDatabase($(`#${noteKey}-note > .note-body > textarea`)[0]);
+        notePageInfo.pendingWrites[noteKey] = 1;
+
+        updateTextInDatabase($(`#${noteKey}-note > .note-body > textarea`)[0], () => {
+          if (Object.keys(notePageInfo.pendingWrites).length === 0) {
+            syncUiChange(true);
+          }
+        });
       }
     }
     e.preventDefault();
-    syncUiChange(true);
   }
 
   //event handlers for dynamically added elements.
@@ -538,17 +525,17 @@ $(function () {
       inputtedTextBox.style.height = 'auto';
       inputtedTextBox.style.height = (inputtedTextBox.scrollHeight + 1) + 'px';
       syncUiChange(false);
-
+      notePageInfo.pendingWrites[noteId] = 1;
       //prevents it from sending more than one write per three seconds
       deferNoDuplicates({
-        callback: () => updateTextInDatabase(inputtedTextBox),
+        callback: () => updateTextInDatabase(
+          inputtedTextBox, () => {
+            if (Object.keys(notePageInfo.pendingWrites).length === 0) {
+              syncUiChange(true);
+            }
+          }),
         timerLength: 3000,
         id: noteId
-      });
-      deferNoDuplicates({
-        callback: () => syncUiChange(true),
-        timerLength: 3500, //an extra 3500 to be sure it has uploaded
-        id: 'all notes saved'
       });
     })
     .on('keydown', '.text-note', (e) => {
