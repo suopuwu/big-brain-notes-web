@@ -373,81 +373,156 @@ $(function () {
     closeRightClickMenu();
     //creates a popup with rename player content
     suopPopup.pop(html `
-      <div>Choose Your Image (1MB limit)</div>
-      <label class="file-upload ripple">
-        <input id="reimagePlayer" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" accept="image/png, image/jpeg, image/gif, image/jpg, image/webp">
-        <span>
-          Upload
-        </span>
-        <img id="image-upload-preview" width="200px">
-      </label>
+      <style>
+         .player-reimage-content {
+          width: 300px;
+          height: 300px;
+          height: 300px;
+         }
+
+        .player-reimage-content > input {
+          display: none;
+        }
+
+        .player-reimage-content > #image-tab-holder {
+          display: flex;
+          justify-content: space-between;
+        }
+
+        #image-tab-holder > label {
+          padding: 10px;
+          border-radius: 2px;
+          cursor: pointer;
+        }
+        #upload-image-radio:checked ~ #character-reimage-container {
+          display: none;
+        }
+        #character-image-radio:checked ~ #image-tab-holder > #character-tab {
+          background-color: #00000020;
+        }
+        
+        #character-image-radio:checked ~ #image-upload-container {
+          display: none;
+        }
+        #upload-image-radio:checked ~ #image-tab-holder > #upload-tab {
+          background-color: #00000020;
+        }
+
+      </style>
+      <div class="player-reimage-content">
+        <input type="radio" name="reimagePlayer-radio" id="upload-image-radio" value="upload" checked>
+        <input type="radio" name="reimagePlayer-radio" id="character-image-radio" value="character">
+        <div id="image-tab-holder">
+          <label class=" ripple" id="upload-tab" for="upload-image-radio">Upload Image</label>
+          <label class=" ripple" id="character-tab" for="character-image-radio">Character Image</label>
+        </div>
+        <div id="image-upload-container">
+        <div>Choose Your Image (1MB limit)</div>
+        <label class="file-upload ripple">
+          <input id="reimagePlayer" type="file" style="width: 10vmax; height: 40px; background-color: transparent; outline: none; border: none;" accept="image/png, image/jpeg, image/gif, image/jpg, image/webp">
+          <span>
+            Upload
+          </span>
+          <img id="image-upload-preview" width="200px">
+        </label>
+      </div>
+      <div id="character-reimage-container">
+        <div>Please type the character's name here.</div>
+        <input id="character-image-chooser">
+      </div>
+
+      </div>
+
       <div style="text-align: right;">
         <a href="javascript:;" class="ripple" id="cancelReimage"><i class="material-icons" style="padding:10px;padding-right: 5;cursor: pointer;">close</i></a>
         <a href="javascript:;" class="ripple" id="confirmReimage"><i class="material-icons" style="padding:10px; cursor: pointer;padding-left: 5px;">check</i></a>
       </div>
     `);
-    //awaits the color entered.
+    //awaits the image chosen.
     $('#reimagePlayer').on('change', () => {
       var file = $('#reimagePlayer')[0].files[0];
       $('#image-upload-preview').attr('src', URL.createObjectURL(file));
     });
     var image = new Promise(function (resolve, reject) {
       $('#confirmReimage').click(() => {
-        var file = $('#reimagePlayer')[0].files[0];
-        //if a file has been chosen
-        if (file) {
-          console.log(file);
-          if (file.size < 1024 * 1024) {
-            resolve($('#reimagePlayer').val());
-          } else {
-            $.mSnackbar.add({
-              text: `<i style="color: #ef5350">Error: </i>File is too large (${Math.trunc(file.size / (1024 *1024))}MB/1MB)`
-            });
-          }
-        } else {
-          $.mSnackbar.add({
-            text: '<i style="color: #ef5350">Error: </i>Please choose a file to upload'
-          });
+        switch ($("input[name='reimagePlayer-radio']:checked").val()) {
+          case 'character':
+            const characterList = Object.keys(basicCharData);
+            var chosenCharacter = $('#character-image-chooser').val();
+            if (characterList.includes(chosenCharacter)) {
+              resolve(chosenCharacter);
+            } else {
+              $.mSnackbar.add({
+                text: '<i style="color: #ef5350">Error: </i>Please type a valid character name'
+              });
+            }
+            break;
+          case 'upload':
+            var file = $('#reimagePlayer')[0].files[0];
+            //if a file has been chosen
+            if (file) {
+              console.log(file);
+              if (file.size < 1024 * 1024) {
+                resolve($('#reimagePlayer').val());
+              } else {
+                $.mSnackbar.add({
+                  text: `<i style="color: #ef5350">Error: </i>File is too large (${Math.trunc(file.size / (1024 *1024))}MB/1MB)`
+                });
+              }
+            } else {
+              $.mSnackbar.add({
+                text: '<i style="color: #ef5350">Error: </i>Please choose a file to upload'
+              });
+            }
+            break;
         }
       });
       $('#cancelReimage').click(() => reject());
     });
     //handles confirmation/cancellation of the rename
     image.then(function (fileName) {
-        var uploadIndicatorId = `upload-percentage${domId}`;
-        var file = $('#reimagePlayer')[0].files[0];
-        var imageHtml = `
-          <span class="character-image" id="${id}-image" style="display: none; background-image: url(${URL.createObjectURL(file)})"></span>
-          `;
+        switch ($("input[name='reimagePlayer-radio']:checked").val()) {
+          case 'character':
+            console.log(fileName);
 
-        //#region updates profile picture in storage
-        var uploadIndicator = $.mSnackbar.add({
-          text: `Uploading <i id="${uploadIndicatorId}">0</i>%`,
-          lifeSpan: Infinity,
-          noCloseButton: true
-        });
-        var imageUpload = storageRef.child(
-          `users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`
-        ).put(file);
-        imageUpload.on('state_changed', (snapshot) => {
-          console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          $('#' + uploadIndicatorId).html(Math.trunc(progress));
-        });
-        imageUpload.then((snapshot) => {
-          console.log('Uploaded photo!');
-          $(`#${uploadIndicator.id}`).find('.mSnackbar-content').html('Upload complete!');
-          setTimeout(() => uploadIndicator.close(), 3000);
-        });
-        //#endregion
-        //updates path to picture in database
-        database.ref('users/' + user.uid + '/players/' + id + '/image')
-          .set(`users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`);
+            break;
+          case 'upload':
+            var uploadIndicatorId = `upload-percentage${domId}`;
+            var file = $('#reimagePlayer')[0].files[0];
+            var imageHtml = `
+              <span class="character-image" id="${id}-image" style="display: none; background-image: url(${URL.createObjectURL(file)})"></span>
+              `; //todo finalize character images.
 
-        //instantly changes html to match the uploading image
-        $('#' + domId + '> .character-image').replaceWith(imageHtml);
-        $('#' + domId).data('imagePath', `users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`);
-        $('#' + domId + '> .character-image').fadeIn();
+            //#region updates profile picture in storage
+            var uploadIndicator = $.mSnackbar.add({
+              text: `Uploading <i id="${uploadIndicatorId}">0</i>%`,
+              lifeSpan: Infinity,
+              noCloseButton: true
+            });
+            var imageUpload = storageRef.child(
+              `users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`
+            ).put(file);
+            imageUpload.on('state_changed', (snapshot) => {
+              console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              $('#' + uploadIndicatorId).html(Math.trunc(progress));
+            });
+            imageUpload.then((snapshot) => {
+              console.log('Uploaded photo!');
+              $(`#${uploadIndicator.id}`).find('.mSnackbar-content').html('Upload complete!');
+              setTimeout(() => uploadIndicator.close(), 3000);
+            });
+            //#endregion
+            //updates path to picture in database
+            database.ref('users/' + user.uid + '/players/' + id + '/image')
+              .set(`users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`);
+
+            //instantly changes html to match the uploading image
+            $('#' + domId + '> .character-image').replaceWith(imageHtml);
+            $('#' + domId).data('imagePath', `users/${user.uid}/images/${id}-profile-picture.${getFileExtension(fileName)}`);
+            $('#' + domId + '> .character-image').fadeIn();
+            break;
+        }
       })
       .finally(function () {
         suopPopup.close();
