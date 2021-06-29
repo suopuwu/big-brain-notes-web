@@ -20,7 +20,7 @@ $(function () {
       actions,
       noCloseButton: noCloseButton
     } = {}) {
-      this.text = text;
+      this._text = text;
       this.lifeSpan = lifeSpan;
       this.hasCloseButton = false;
       if (!actions) {
@@ -125,6 +125,13 @@ $(function () {
         setTimeout(() => this.$ref.remove(), 500);
         delete snackbars[this.id];
       }
+    }
+    get text() {
+      return this._text;
+    }
+    set text(newText) {
+      this._text = newText;
+      this.$ref.find('.mSnackbar-content').html(newText);
     }
   }
 

@@ -1,9 +1,9 @@
 $(function () {
-  const bbnVersion = '0.0.0';
+  const bbnVersion = '1.0.0';
   database.ref("version").on('value', (version) => {
     console.log(version.val());
     if (version.val() !== bbnVersion) {
-      var updatePrompter = $.mSnackbar({
+      var updatePrompter = $.mSnackbar.add({
         text: `You are on version ${bbnVersion}, the latest is ${version.val()}. Please refresh the page to update. Major features may not work otherwise.`,
         lifeSpan: Infinity
       });
@@ -82,9 +82,9 @@ $(function () {
   firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
       if (!user.emailVerified) {
-        $.mSnackbar({
+        $.mSnackbar.add({
           text: 'You have not verified your email. Please do so, as without a verified email, the app will not work.',
-
+          lifeSpan: Infinity
         });
       }
       //if already logged in

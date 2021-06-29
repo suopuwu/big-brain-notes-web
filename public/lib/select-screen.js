@@ -509,7 +509,7 @@ $(function () {
             });
             imageUpload.then((snapshot) => {
               console.log('Uploaded photo!');
-              $(`#${uploadIndicator.id}`).find('.mSnackbar-content').html('Upload complete!');
+              uploadIndicator.html('Upload complete!');
               setTimeout(() => uploadIndicator.close(), 3000);
             });
             //#endregion

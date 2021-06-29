@@ -1,6 +1,6 @@
-const windowUrl = 'players/-MWM43Pmy8tD8pH_Pv2A'; //for debug purposes
+// const windowUrl = 'players/-MWM43Pmy8tD8pH_Pv2A'; //for debug purposes
 // removes the first / of the url path
-// const windowUrl = window.location.pathname.substring(1);
+const windowUrl = window.location.pathname.substring(1);
 //returns an ever increasing value, there can be no duplicates because each time it is called, it increases.
 var iterator = function () {
   let value = 0;
@@ -262,7 +262,7 @@ $(function () {
         });
         imageUpload.then((snapshot) => {
           console.log('Uploaded photo!');
-          $(`#${uploadIndicator.id}`).find('.mSnackbar-content').html('Upload complete!');
+          uploadIndicator.html('Upload complete!');
           setTimeout(() => uploadIndicator.close(), 3000);
         });
         //updates path to picture in database
