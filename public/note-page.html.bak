@@ -47,7 +47,7 @@
     </span>
     <span class="nav-ui">To change an image, click the image</span>
     <span class="nav-ui">To rename or delete notes, right click them</span>
-    <script defer src="/lib/vue.min.js"></script>
+    <script defer src="lib/vue.min.js"></script>
 
     <div id="app" style="display: none;">
       <h1>Character Info</h1>
