@@ -22,7 +22,6 @@ $(function () {
     } = {}) {
       this._text = text;
       this.lifeSpan = lifeSpan;
-      this.hasCloseButton = false;
       if (!actions) {
         actions = [];
       }

@@ -285,4 +285,10 @@ h2 {
 
 #nav-back-arrow {
   padding-bottom: 10px;
+}
+
+.character-info > span {
+  display: block;
+  text-transform: capitalize;
+  font-size: 1.2em;
 }/*# sourceMappingURL=note.css.map */

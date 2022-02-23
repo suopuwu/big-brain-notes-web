@@ -782,6 +782,15 @@ var basicCharData = {
         "initial dash": 2.45,
         "theme": 0xff69e6c3
     },
+    "kazuya": {
+        "number": 81,
+        "weight": 113,
+        "run speed": 1.55,
+        "fall speed": 1.7,
+        "air speed": 0.89,
+        "initial dash": 1.58,
+        "theme": 0xffa52319
+    }
 };
 
 function pickRandomCharacter() {

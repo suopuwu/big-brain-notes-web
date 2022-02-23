@@ -1,11 +1,22 @@
+/**
+ * On adding new characters:
+ * 1. copy the tile html and change necessary data
+ * 2. download image of new character, put in images folder
+ * 3. in characterData.js, add the new character's info
+ * 4. below, change the version number
+ * 5. in the firebase console, change the version number
+ * 6. 'firebase deploy' in console
+ */
 $(function () {
-  const bbnVersion = '1.0.0';
+  const bbnVersion = '1.2.0';
   database.ref("version").on('value', (version) => {
-    console.log(version.val());
+    console.log('Current: ' + bbnVersion);
+    console.log('Latest: ' + version.val());
     if (version.val() !== bbnVersion) {
       var updatePrompter = $.mSnackbar.add({
-        text: `You are on version ${bbnVersion}, the latest is ${version.val()}. Please refresh the page to update. Major features may not work otherwise.`,
-        lifeSpan: Infinity
+        text: `<i style="color: #ef5350">Notice: </i>You are on version ${bbnVersion}, the latest is ${version.val()}. Please hold control and refresh the page to update. Major features may not work otherwise.`,
+        lifeSpan: Infinity,
+        noCloseButton: true
       });
     }
   });
@@ -83,8 +94,9 @@ $(function () {
     if (user) {
       if (!user.emailVerified) {
         $.mSnackbar.add({
-          text: 'You have not verified your email. Please do so, as without a verified email, the app will not work.',
-          lifeSpan: Infinity
+          text: '<i style="color: #ef5350">Notice: </i>You have not verified your email. Please do so, as without a verified email, the app will not work.',
+          lifeSpan: Infinity,
+          noCloseButton: true
         });
       }
       //if already logged in

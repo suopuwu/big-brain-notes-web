@@ -1,1 +1,2 @@
 Once you have made the changes you want to the code, go into auth.js and change the version number. Also change the version number in firebase. Then do a "firebase deploy" and you should be done.
+For development: firebase emulators:start

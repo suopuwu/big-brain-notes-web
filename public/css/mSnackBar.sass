@@ -62,14 +62,14 @@ $effect-size: 15px
       @extend %button
       height: $close-size
       width: $close-size
-      margin-left: ($close-effect-size - $close-size) / 2 + $item-spacing
+      margin-left: ($close-effect-size - $close-size) * 0.5 + $item-spacing
       &::after
         border-radius: 100%
         width: $close-effect-size
         height: $close-effect-size
     .mSnackbar-action
       @extend %button
-      margin: 0 $effect-size / 2 0 $item-spacing + $effect-size / 2
+      margin: 0 $effect-size * 0.5 0 $item-spacing + $effect-size * 0.5
       font-weight: bold
       &:first-of-type
       &::after
@@ -77,7 +77,7 @@ $effect-size: 15px
         height: calc(100% + #{$effect-size})
         border-radius: 4px
     span:first-of-type
-      margin: 0 $effect-size / 2 0 $item-spacing * 3 + $effect-size / 2
+      margin: 0 $effect-size * 0.5 0 $item-spacing * 3 + $effect-size * 0.5
 
     .mSnackbar-flex-grow-spacer
       flex-grow: 1
